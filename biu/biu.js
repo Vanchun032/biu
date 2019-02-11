@@ -664,11 +664,14 @@
 		BIU_GLOBAL.checkedSVGItem = []
 		//选中当前单个对象
 		BIU_GLOBAL.checkedSVGItem.push(this)
-		//重置并生成辅助点
-		BIU_GLOBAL.checkedAUX.reset()
 		//记录自身的选中状态，且设置样式
 		this.checked = true
 		this._dom.g.style.cursor = 'move'
+		//重渲染dom使当前元素在最上层
+		BIU_GLOBAL.svg.removeChild(this._dom.g)
+		BIU_GLOBAL.svg.appendChild(this._dom.g)
+		//重置并生成辅助点
+		BIU_GLOBAL.checkedAUX.reset()
 	}
 	
 	SVGItemProto.addThis = function() {
