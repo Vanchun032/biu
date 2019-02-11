@@ -48,6 +48,17 @@
 		textAlign: 'center',
 		userSelect: 'none'
 	}
+	const CONTEXT_MENU_STYLE = {
+		backgroundColor: '#f7f7f7',
+		listStyle: 'none',
+		textAlign: 'center',
+		padding: 0,
+		margin: 0
+	}
+	const CONTEXT_MENU_ITEM_STYLE = {
+		padding: '2px 20px',
+		cursor: 'default'
+	}
 	const SVG_SIZE = {
 		width: 1920,
 		height: 1080
@@ -66,42 +77,118 @@
 		chache: {
 			title: '叉车',
 			url: 'http://vanchun.oss-cn-shenzhen.aliyuncs.com/biu/menuItems/chache.svg',
-			color: '#DDDDFF'
+			color: '#DDDDFF',
+			menus: [
+				{
+					name: '删除',
+					callBack: function(self) {
+						self.destory()
+					}
+				},
+				{
+					name: '自定义菜单1',
+					callBack: function() {
+						console.log('菜单可以自定义')
+					}
+				},
+				{
+					name: '自定义菜单2',
+					callBack: function() {
+						console.log('真的可以自定义')
+					}
+				}
+			]
 		},
 		huoxiang: {
 			title: '货箱',
 			url: 'http://vanchun.oss-cn-shenzhen.aliyuncs.com/biu/menuItems/xiangzi.svg',
-			color: '#C4E1FF'
+			color: '#C4E1FF',
+			menus: [
+				{
+					name: '删除',
+					callBack: function(self) {
+						self.destory()
+					}
+				}
+			]
 		},
 		kaixiang: {
 			title: '开箱',
 			url: 'http://vanchun.oss-cn-shenzhen.aliyuncs.com/biu/menuItems/kaixiang.svg',
-			color: '#D9FFFF'
+			color: '#D9FFFF',
+			menus: [
+				{
+					name: '删除',
+					callBack: function(self) {
+						self.destory()
+					}
+				}
+			]
 		},
 		kucun: {
 			title: '库存',
 			url: 'http://vanchun.oss-cn-shenzhen.aliyuncs.com/biu/menuItems/kucun.svg',
-			color: '#D7FFEE'
+			color: '#D7FFEE',
+			menus: [
+				{
+					name: '删除',
+					callBack: function(self) {
+						self.destory()
+					}
+				}
+			]
 		},
 		dingwei: {
 			title: '定位',
 			url: 'http://vanchun.oss-cn-shenzhen.aliyuncs.com/biu/menuItems/dingwei.svg',
-			color: '#BBFFBB'
+			color: '#BBFFBB',
+			menus: [
+				{
+					name: '删除',
+					callBack: function(self) {
+						self.destory()
+					}
+				}
+			]
 		},
 		jiansuo: {
 			title: '检索',
 			url: 'http://vanchun.oss-cn-shenzhen.aliyuncs.com/biu/menuItems/jiansuo.svg',
-			color: '#DEFFAC'
+			color: '#DEFFAC',
+			menus: [
+				{
+					name: '删除',
+					callBack: function(self) {
+						self.destory()
+					}
+				}
+			]
 		},
 		louyu: {
 			title: '楼宇',
 			url: 'http://vanchun.oss-cn-shenzhen.aliyuncs.com/biu/menuItems/louyu.svg',
-			color: '#FFFFB9'
+			color: '#FFFFB9',
+			menus: [
+				{
+					name: '删除',
+					callBack: function(self) {
+						self.destory()
+					}
+				}
+			]
 		},
 		tongji: {
 			title: '统计',
 			url: 'http://vanchun.oss-cn-shenzhen.aliyuncs.com/biu/menuItems/tongji.svg',
-			color: '#FFF0AC'
+			color: '#FFF0AC',
+			menus: [
+				{
+					name: '删除',
+					callBack: function(self) {
+						self.destory()
+					}
+				}
+			]
 		}
 	}
 
@@ -174,7 +261,35 @@
 		mouse: {x: 0, y: 0, setPosition: function(ev) {
 			BIU_GLOBAL.mouse.x = ev.offsetX
 			BIU_GLOBAL.mouse.y = ev.offsetY
-		}}
+		}},
+		//右键菜单
+		contextMenu: {
+			dom: {},
+			hide: function() {
+				this.dom.style.display = 'none'
+			},
+			show: function(x, y) {
+				this.dom.style.left = x + 'px'
+				this.dom.style.top = y + 'px'
+				this.dom.style.right = 'initial'
+				this.dom.style.bottom = 'initial'
+				this.dom.style.display = 'block'
+				//处理反向菜单
+				//高度越界
+				if (y + this.dom.clientHeight >= document.documentElement.clientHeight) {
+					this.dom.style.top = 'initial'
+					this.dom.style.bottom = (document.documentElement.clientHeight - y) + 'px'
+				}
+				//宽度越界
+				if (x + this.dom.clientWidth >= document.documentElement.clientWidth) {
+					this.dom.style.left = 'initial'
+					this.dom.style.right = (document.documentElement.clientWidth - x) + 'px'
+				}
+				console.log([this.dom])
+				console.log(y)
+				console.log(this.dom.clientHeight)
+			}
+		}
 	}
 	
 	/**
@@ -253,7 +368,7 @@
 			new SVGItem(item_name, x, y)
 		})
 		//点击背景，取消元素的选中
-		this._svg.addEventListener('click', function() {
+		this._svg.addEventListener('mousedown', function() {
 			BIU_GLOBAL.checkedSVGItem.forEach(item => {
 				item.uncheckThis()
 			})
@@ -271,6 +386,10 @@
 			this.removeEventListener('mousemove', bottomLeftZoom)
 			this.removeEventListener('mousemove', bottomMiddleZoom)
 			this.removeEventListener('mousemove', bottomRightZoom)
+		})
+		//背景板可以取消右键菜单
+		this._svg.addEventListener('mousedown', function() {
+			BIU_GLOBAL.contextMenu.hide()
 		})
 	}
 
@@ -538,6 +657,16 @@
 			BIU_GLOBAL.checkedAUX.dots[key]._resize()
 		}
 	}
+	
+	biuProto._initContextMenu = function() {
+		//全局右键菜单对象的初始化
+		var ul = document.createElement('ul')
+		ul.style.display = 'none'
+		ul.style.position = 'absolute'
+		setStyle(ul, BIU_GLOBAL.option.contextMenuStyle, CONTEXT_MENU_STYLE)
+		document.getElementsByTagName('body')[0].appendChild(ul)
+		BIU_GLOBAL.contextMenu.dom = ul
+	}
 
 	//配置项的设置
 	biuProto.setOption = function(option) {
@@ -551,6 +680,8 @@
 		this._initSVG()
 		//事件配置
 		this._initEvent()
+		//右键菜单初始化
+		this._initContextMenu()
 	}
 
 	//菜单图标的容器类
@@ -641,6 +772,33 @@
 				BIU_GLOBAL.svg.addEventListener('mousemove', itemMove)
 			}
 		})
+		//点击元素隐藏右键菜单
+		this._dom.g.addEventListener('mousedown', function() {
+			BIU_GLOBAL.contextMenu.hide()
+		})
+		//动态生成右键菜单
+		this._dom.g.addEventListener('contextmenu', function(ev) {
+			var menuConfig = BIU_GLOBAL.option.menuConfig || MENU_CONF
+			var menuItem = menuConfig[self.item_name]
+			//如果该元素配置了右键菜单，则生成并展示
+			if (menuItem.menus && menuItem.menus.length > 0) {
+				//清空原有的右键菜单
+				BIU_GLOBAL.contextMenu.dom.innerHTML = ''
+				menuItem.menus.forEach(menuEntry => {
+					var li = document.createElement('li')
+					li.innerHTML = menuEntry.name
+					setStyle(li, BIU_GLOBAL.option.contextMenuItemStyle, CONTEXT_MENU_ITEM_STYLE)
+					li.addEventListener('click', function() {
+						menuEntry.callBack(self)
+						//执行后隐藏右键菜单
+						BIU_GLOBAL.contextMenu.hide()
+					})
+					BIU_GLOBAL.contextMenu.dom.appendChild(li)
+				})
+				//展示右键菜单
+				BIU_GLOBAL.contextMenu.show(ev.clientX, ev.clientY)
+			}
+		})
 	}
 
 	SVGItemProto._resize = function() {
@@ -689,6 +847,17 @@
 		this._dom.g.style.cursor = 'auto'
 	}
 	
+	SVGItemProto.destory = function() {
+		//避免选中状态
+		BIU_GLOBAL.checkedSVGItem.forEach(item => {
+			item.uncheckThis()
+		})
+		BIU_GLOBAL.checkedSVGItem = []
+		BIU_GLOBAL.checkedAUX.cleanDots()
+		//删除自身dom
+		BIU_GLOBAL.svg.removeChild(this._dom.g)
+	}
+	
 	/**
 	 * 八个选择辅助点对象的定义
 	 */
@@ -713,6 +882,10 @@
 		this._initEvent = function(callBack) {
 			this._dom.addEventListener('click', function(ev) {
 				ev.stopPropagation()
+			})
+			//点击元素隐藏右键菜单
+			this._dom.addEventListener('mousedown', function() {
+				BIU_GLOBAL.contextMenu.hide()
 			})
 			this._dom.addEventListener('mousedown', function(ev) {
 				ev.stopPropagation()
