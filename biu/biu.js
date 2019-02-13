@@ -147,7 +147,7 @@
 			],
 			//自定义init事件
 			init : function(self) {
-				var itemMenuConf = BIU_GLOBAL.option.itemMenuConf ? BIU_GLOBAL.option.itemMenuConf : ITEM_MENU_CONF
+				var itemMenuConf = getItemMenuConf()
 				var g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
 				var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
 				rect.setAttribute('fill', itemMenuConf[self.item_name].color)
@@ -270,16 +270,15 @@
 	
 	//默认生命周期
 	const SVG_ITEM_LIFE = {
-		init: function(self) {
-			var itemMenuConf = BIU_GLOBAL.option.itemMenuConf ? BIU_GLOBAL.option.itemMenuConf : ITEM_MENU_CONF
+		init: function(self, itemMenu, svg) {
 			var g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
 			var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-			rect.setAttribute('fill', itemMenuConf[self.item_name].color)
+			rect.setAttribute('fill', itemMenu[self.item_name].color)
 			var img = document.createElementNS('http://www.w3.org/2000/svg', 'image')
-			img.href.baseVal = itemMenuConf[self.item_name].url
+			img.href.baseVal = itemMenu[self.item_name].url
 			g.appendChild(rect)
 			g.appendChild(img)
-			BIU_GLOBAL.svg.appendChild(g)
+			svg.appendChild(g)
 			return g
 		},
 		resize: function(self) {
@@ -443,12 +442,17 @@
 	//item菜单的创建
 	biuProto._initItemMenu = function() {
 		var self = this
-		var itemMenuConf = BIU_GLOBAL.option.itemMenuConf ? BIU_GLOBAL.option.itemMenuConf : ITEM_MENU_CONF
+		var itemMenuConf = getItemMenuConf()
 		Object.keys(itemMenuConf).forEach(function(key) {
 			//为每一个item创建dom元素，加入页面
 			var item = itemMenuConf[key]
 			self.menuItems.push(new MenuItem(key, item, self._itemMenu))
 		})
+	}
+	
+	function getItemMenuConf() {
+		var option = BIU_GLOBAL.option || {}
+		return option.itemMenuConf ? option.itemMenuConf : ITEM_MENU_CONF
 	}
 
 	//feature菜单的创建
@@ -859,8 +863,9 @@
 	var SVGItemProto = SVGItem.prototype
 
 	SVGItemProto._initDom = function() {
-		var init = [self.item_name].init || SVG_ITEM_LIFE.init
-		return init(this)
+		var itemMenuConf = getItemMenuConf()
+		var init = itemMenuConf[this.item_name].init || SVG_ITEM_LIFE.init
+		return init(this, getItemMenuConf(), BIU_GLOBAL.svg)
 	}
 
 	SVGItemProto._initEvent = function() {
@@ -889,7 +894,7 @@
 		})
 		//动态生成右键菜单
 		this._dom.addEventListener('contextmenu', function(ev) {
-			var itemMenuConf = BIU_GLOBAL.option.itemMenuConf ? BIU_GLOBAL.option.itemMenuConf : ITEM_MENU_CONF
+			var itemMenuConf = getItemMenuConf()
 			var menuItem = itemMenuConf[self.item_name]
 			//如果该元素配置了右键菜单，则生成并展示
 			if (menuItem.menus && menuItem.menus.length > 0) {
