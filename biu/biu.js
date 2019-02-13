@@ -67,11 +67,15 @@
 	}
 	const BODY_STYLE = {
 		width: '90%',
-		height: '100%'
+		height: '100%',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: '#333'
 	}
 	const SVG_STYLE = {
 		width: '100%',
-		backgroundColor: '#333'
+		backgroundColor: '#fff'
 	}
 	const MENU_ITEM_STYLE = {
 		width: '90px',
@@ -307,6 +311,7 @@
 	//各类全局对象
 	var BIU_GLOBAL = {
 		option : null,
+		SVGItems: [],
 		checkedSVGItem: [], //已选中的对象数组
 		checkedAUX: { //选中信息的辅助点，总共有八个
 			area: {}, //选中全部元素所占的区域
@@ -847,17 +852,20 @@
 	}
 	
 	//右侧内容的容器类
-	function SVGItem(item_name, x, y) {
+	function SVGItem(item_name, x, y, data) {
 		this.item_name = item_name
 		this.x = x
 		this.y = y
 		this.checked = false
 		var svgItemSize = BIU_GLOBAL.option.svgItemSize || {}
 		this.width = svgItemSize.width ? svgItemSize.width : SVG_ITEM_SIZE.width
-		this.height = svgItemSize.height ? svgItemSize.height : SVG_ITEM_SIZE.height
+		this.height = svgItemSize.height ? svgItemSize.height : SVG_ITEM_SIZE.height,
+		this.data = data || {}
 		this._dom = this._initDom()
 		this._initEvent()
 		this._resize()
+		//保存到全局
+		BIU_GLOBAL.SVGItems.push(this)
 	}
 
 	var SVGItemProto = SVGItem.prototype
@@ -865,7 +873,7 @@
 	SVGItemProto._initDom = function() {
 		var itemMenuConf = getItemMenuConf()
 		var init = itemMenuConf[this.item_name].init || SVG_ITEM_LIFE.init
-		return init(this, getItemMenuConf(), BIU_GLOBAL.svg)
+		return init(this, itemMenuConf, BIU_GLOBAL.svg)
 	}
 
 	SVGItemProto._initEvent = function() {
@@ -918,7 +926,8 @@
 	}
 
 	SVGItemProto._resize = function() {
-		var resize = [self.item_name].resize || SVG_ITEM_LIFE.resize
+		var itemMenuConf = getItemMenuConf()
+		var resize = itemMenuConf[this.item_name].resize || SVG_ITEM_LIFE.resize
 		resize(this)
 	}
 	
@@ -962,6 +971,14 @@
 		})
 		BIU_GLOBAL.checkedSVGItem = []
 		BIU_GLOBAL.checkedAUX.cleanDots()
+		//在全局对象数组中删除自身的引用
+		var arr = []
+		for (var x = 0; x < BIU_GLOBAL.SVGItems.length; x++) {
+			if (this != BIU_GLOBAL.SVGItems[x]) {
+				arr.push(BIU_GLOBAL.SVGItems[x])
+			}
+		}
+		BIU_GLOBAL.SVGItems = arr
 		//删除自身dom
 		BIU_GLOBAL.svg.removeChild(this._dom)
 	}
@@ -1181,10 +1198,11 @@
 	}
 	
 	//向客户提供创建元素的能力
-	function createItem(item_name, x, y) {
-		return new SVGItem(item_name, x, y)
+	function createItem(item_name, x, y, data) {
+		return new SVGItem(item_name, x, y, data)
 	}
 	
 	exports.init = init
 	exports.createItem = createItem
+	exports.items = BIU_GLOBAL.SVGItems
 })));
