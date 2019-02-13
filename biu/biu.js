@@ -34,7 +34,7 @@
 		alignItems: 'center',
 		cursor: 'pointer'
 	}
-	const MENU_SUBMENU_STYLE = {
+	const ITEM_MENU_STYLE = {
 		width: '100%',
 		height: '95%',
 		backgroundColor: '#f7f7f7',
@@ -44,6 +44,17 @@
 		alignItems: 'flex-start',
 		boxSizing: 'border-box',
 		padding: '20px 20px'
+	}
+	const FEATURE_MENU_STYLE = {
+		width: '100%',
+		height: '95%',
+		backgroundColor: '#f7f7f7',
+		display: 'flex',
+		flexDirection: 'column',
+		justifyContent: 'flex-start',
+		alignItems: 'flex-start',
+		boxSizing: 'border-box',
+		padding: '0'
 	}
 	const BODY_STYLE = {
 		width: '90%',
@@ -66,6 +77,14 @@
 	const MENU_ITEM_TITLE_STYLE = {
 		textAlign: 'center',
 		userSelect: 'none'
+	}
+	const FEATURE_MENU_ITEM_STYLE = {
+		width: '100%',
+		height: '40px',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+		cursor: 'pointer'
 	}
 	const CONTEXT_MENU_STYLE = {
 		backgroundColor: '#f7f7f7',
@@ -245,9 +264,9 @@
 		init: function(self) {
 			var g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
 			var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-			rect.setAttribute('fill', MENU_CONF[self.item_name].color)
+			rect.setAttribute('fill', ITEM_MENU_CONF[self.item_name].color)
 			var img = document.createElementNS('http://www.w3.org/2000/svg', 'image')
-			img.href.baseVal = MENU_CONF[self.item_name].url
+			img.href.baseVal = ITEM_MENU_CONF[self.item_name].url
 			g.appendChild(rect)
 			g.appendChild(img)
 			BIU_GLOBAL.svg.appendChild(g)
@@ -396,14 +415,14 @@
 		this._featureMenuBtn = document.createElement('div')
 		setStyle(this._itemMenuBtn, BIU_GLOBAL.option.menuBtnStyle, MENU_BTN_STYLE)
 		setStyle(this._featureMenuBtn, BIU_GLOBAL.option.menuBtnStyle, MENU_BTN_STYLE)
-		this._itemMenuBtn.innerHTML = '元素菜单'
-		this._featureMenuBtn.innerHTML = '功能菜单'
+		this._itemMenuBtn.innerHTML = '元素'
+		this._featureMenuBtn.innerHTML = '功能'
 		this._menu.appendChild(this._itemMenuBtn)
 		this._menu.appendChild(this._featureMenuBtn)
 		this._itemMenu = document.createElement('div')
 		this._featureMenu = document.createElement('div')
-		setStyle(this._itemMenu, BIU_GLOBAL.option.subMenuStyle, MENU_SUBMENU_STYLE)
-		setStyle(this._featureMenu, BIU_GLOBAL.option.subMenuStyle, MENU_SUBMENU_STYLE)
+		setStyle(this._itemMenu, BIU_GLOBAL.option.subMenuStyle, ITEM_MENU_STYLE)
+		setStyle(this._featureMenu, BIU_GLOBAL.option.subMenuStyle, FEATURE_MENU_STYLE)
 		self._featureMenu.style.display = 'none'
 		this._menu.appendChild(this._itemMenu)
 		this._menu.appendChild(this._featureMenu)
@@ -440,9 +459,15 @@
 
 	//feature菜单的创建
 	biuProto._initFeatureMenu = function() {
+		var self = this
 		var feaureMenuConf = BIU_GLOBAL.option.featureMenuConf || FEATURE_MENU_CONF
 		feaureMenuConf.forEach(feature => {
-			console.log(feature)
+			//创建dom元素，加入页面
+			var featureMenuItem = document.createElement('div')
+			setStyle(featureMenuItem, BIU_GLOBAL.option.fuatureMenuItem, FEATURE_MENU_ITEM_STYLE)
+			featureMenuItem.innerHTML = feature.name
+			featureMenuItem.addEventListener('click', feature.feature)
+			self._featureMenu.appendChild(featureMenuItem)
 		})
 	}
 
@@ -870,7 +895,7 @@
 		})
 		//动态生成右键菜单
 		this._dom.addEventListener('contextmenu', function(ev) {
-			var menuConfig = BIU_GLOBAL.option.menuConfig || MENU_CONF
+			var menuConfig = BIU_GLOBAL.option.menuConfig || ITEM_MENU_CONF
 			var menuItem = menuConfig[self.item_name]
 			//如果该元素配置了右键菜单，则生成并展示
 			if (menuItem.menus && menuItem.menus.length > 0) {
