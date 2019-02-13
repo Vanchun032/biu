@@ -97,7 +97,23 @@
 						console.log('真的可以自定义')
 					}
 				}
-			]
+			],
+			//自定义init事件
+			init : function(self) {
+				var g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+				var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+				rect.setAttribute('fill', MENU_CONF[self.item_name].color)
+				var img = document.createElementNS('http://www.w3.org/2000/svg', 'image')
+				img.href.baseVal = MENU_CONF[self.item_name].url
+				g.appendChild(rect)
+				g.appendChild(img)
+				BIU_GLOBAL.svg.appendChild(g)
+				return {
+					g: g,
+					rect: rect,
+					img: img
+				}
+			}
 		},
 		huoxiang: {
 			title: '货箱',
@@ -189,6 +205,33 @@
 					}
 				}
 			]
+		}
+	}
+	
+	//默认生命周期
+	const SVG_ITEM_LIFE = {
+		init: function(self) {
+			var g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+			var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+			rect.setAttribute('fill', MENU_CONF[self.item_name].color)
+			var img = document.createElementNS('http://www.w3.org/2000/svg', 'image')
+			img.href.baseVal = MENU_CONF[self.item_name].url
+			g.appendChild(rect)
+			g.appendChild(img)
+			BIU_GLOBAL.svg.appendChild(g)
+			return g
+		},
+		resize: function(self) {
+			self._dom.children[0].setAttribute('x', self.x)
+			self._dom.children[0].setAttribute('y', self.y)
+			self._dom.children[0].setAttribute('width', self.width)
+			self._dom.children[0].setAttribute('height', self.height)
+			//IMG
+			self._dom.children[1].setAttribute('height', 60)
+			self._dom.children[1].setAttribute('width', 60)
+			//手动计算居中
+			self._dom.children[1].setAttribute('x', self.x + (self.width - 60)/2)
+			self._dom.children[1].setAttribute('y', self.y + (self.height - 60)/2)
 		}
 	}
 
@@ -285,9 +328,6 @@
 					this.dom.style.left = 'initial'
 					this.dom.style.right = (document.documentElement.clientWidth - x) + 'px'
 				}
-				console.log([this.dom])
-				console.log(y)
-				console.log(this.dom.clientHeight)
 			}
 		}
 	}
@@ -737,24 +777,13 @@
 	var SVGItemProto = SVGItem.prototype
 
 	SVGItemProto._initDom = function() {
-		var g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
-		var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-		rect.setAttribute('fill', MENU_CONF[this.item_name].color)
-		var img = document.createElementNS('http://www.w3.org/2000/svg', 'image')
-		img.href.baseVal = MENU_CONF[this.item_name].url
-		g.appendChild(rect)
-		g.appendChild(img)
-		BIU_GLOBAL.svg.appendChild(g)
-		return {
-			g: g,
-			rect: rect,
-			img: img
-		}
+		var init = [self.item_name].init || SVG_ITEM_LIFE.init
+		return init(this)
 	}
 
 	SVGItemProto._initEvent = function() {
 		var self = this
-		this._dom.g.addEventListener('click', function(ev) {
+		this._dom.addEventListener('click', function(ev) {
 			ev.stopPropagation()
 			if (ev.ctrlKey && !self.checked) {
 				self.addThis()
@@ -762,7 +791,7 @@
 				self.checkThis()
 			}
 		})
-		this._dom.g.addEventListener('mousedown', function(ev) {
+		this._dom.addEventListener('mousedown', function(ev) {
 			ev.stopPropagation()
 			//点击被选中的元素，则绑定拖拽事件
 			if (self.checked) {
@@ -773,11 +802,11 @@
 			}
 		})
 		//点击元素隐藏右键菜单
-		this._dom.g.addEventListener('mousedown', function() {
+		this._dom.addEventListener('mousedown', function() {
 			BIU_GLOBAL.contextMenu.hide()
 		})
 		//动态生成右键菜单
-		this._dom.g.addEventListener('contextmenu', function(ev) {
+		this._dom.addEventListener('contextmenu', function(ev) {
 			var menuConfig = BIU_GLOBAL.option.menuConfig || MENU_CONF
 			var menuItem = menuConfig[self.item_name]
 			//如果该元素配置了右键菜单，则生成并展示
@@ -802,16 +831,8 @@
 	}
 
 	SVGItemProto._resize = function() {
-		this._dom.rect.setAttribute('x', this.x)
-		this._dom.rect.setAttribute('y', this.y)
-		this._dom.rect.setAttribute('width', this.width)
-		this._dom.rect.setAttribute('height', this.height)
-		//IMG
-		this._dom.img.setAttribute('height', 60)
-		this._dom.img.setAttribute('width', 60)
-		//手动计算居中
-		this._dom.img.setAttribute('x', this.x + (this.width - 60)/2)
-		this._dom.img.setAttribute('y', this.y + (this.height - 60)/2)
+		var resize = [self.item_name].resize || SVG_ITEM_LIFE.resize
+		resize(this)
 	}
 	
 	SVGItemProto.checkThis = function() {
@@ -824,10 +845,10 @@
 		BIU_GLOBAL.checkedSVGItem.push(this)
 		//记录自身的选中状态，且设置样式
 		this.checked = true
-		this._dom.g.style.cursor = 'move'
+		this._dom.style.cursor = 'move'
 		//重渲染dom使当前元素在最上层
-		BIU_GLOBAL.svg.removeChild(this._dom.g)
-		BIU_GLOBAL.svg.appendChild(this._dom.g)
+		BIU_GLOBAL.svg.removeChild(this._dom)
+		BIU_GLOBAL.svg.appendChild(this._dom)
 		//重置并生成辅助点
 		BIU_GLOBAL.checkedAUX.reset()
 	}
@@ -839,12 +860,12 @@
 		BIU_GLOBAL.checkedAUX.reset()
 		//记录自身的选中状态，且设置样式
 		this.checked = true
-		this._dom.g.style.cursor = 'move'
+		this._dom.style.cursor = 'move'
 	}
 	
 	SVGItemProto.uncheckThis = function() {
 		this.checked = false
-		this._dom.g.style.cursor = 'auto'
+		this._dom.style.cursor = 'auto'
 	}
 	
 	SVGItemProto.destory = function() {
@@ -855,7 +876,7 @@
 		BIU_GLOBAL.checkedSVGItem = []
 		BIU_GLOBAL.checkedAUX.cleanDots()
 		//删除自身dom
-		BIU_GLOBAL.svg.removeChild(this._dom.g)
+		BIU_GLOBAL.svg.removeChild(this._dom)
 	}
 	
 	/**
