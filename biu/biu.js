@@ -25,7 +25,16 @@
 		alignItems: 'flex-start',
 		padding: 0
 	}
-	const MENU_BTN_STYLE = {
+	const ITEM_BTN_STYLE = {
+		width: '50%',
+		height: '5%',
+		backgroundColor: '#f7f7f7',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+		cursor: 'pointer'
+	}
+	const FEATURE_BTN_STYLE = {
 		width: '50%',
 		height: '5%',
 		backgroundColor: '#d6d6d6',
@@ -48,7 +57,7 @@
 	const FEATURE_MENU_STYLE = {
 		width: '100%',
 		height: '95%',
-		backgroundColor: '#f7f7f7',
+		backgroundColor: '#d6d6d6',
 		display: 'flex',
 		flexDirection: 'column',
 		justifyContent: 'flex-start',
@@ -62,7 +71,6 @@
 	}
 	const SVG_STYLE = {
 		width: '100%',
-		height: '100%',
 		backgroundColor: '#333'
 	}
 	const MENU_ITEM_STYLE = {
@@ -139,11 +147,12 @@
 			],
 			//自定义init事件
 			init : function(self) {
+				var itemMenuConf = BIU_GLOBAL.option.itemMenuConf ? BIU_GLOBAL.option.itemMenuConf : ITEM_MENU_CONF
 				var g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
 				var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-				rect.setAttribute('fill', MENU_CONF[self.item_name].color)
+				rect.setAttribute('fill', itemMenuConf[self.item_name].color)
 				var img = document.createElementNS('http://www.w3.org/2000/svg', 'image')
-				img.href.baseVal = MENU_CONF[self.item_name].url
+				img.href.baseVal = itemMenuConf[self.item_name].url
 				g.appendChild(rect)
 				g.appendChild(img)
 				BIU_GLOBAL.svg.appendChild(g)
@@ -262,11 +271,12 @@
 	//默认生命周期
 	const SVG_ITEM_LIFE = {
 		init: function(self) {
+			var itemMenuConf = BIU_GLOBAL.option.itemMenuConf ? BIU_GLOBAL.option.itemMenuConf : ITEM_MENU_CONF
 			var g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
 			var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-			rect.setAttribute('fill', ITEM_MENU_CONF[self.item_name].color)
+			rect.setAttribute('fill', itemMenuConf[self.item_name].color)
 			var img = document.createElementNS('http://www.w3.org/2000/svg', 'image')
-			img.href.baseVal = ITEM_MENU_CONF[self.item_name].url
+			img.href.baseVal = itemMenuConf[self.item_name].url
 			g.appendChild(rect)
 			g.appendChild(img)
 			BIU_GLOBAL.svg.appendChild(g)
@@ -373,22 +383,6 @@
 	}
 	
 	/**
-	 * 初始化biu对象
-	 */
-	function init(dom) {
-		if (!dom) {
-			throw new Error('没有指定元素')
-		}
-		//全局关闭右键
-		document.oncontextmenu = function() {
-			return false
-		}
-		var biu = new BIU(dom)
-		return biu
-	}
-
-
-	/**
 	 * @BIU模块
 	 */
 	function BIU(dom) {
@@ -413,8 +407,8 @@
 		//创建元素菜单和功能菜单的按钮
 		this._itemMenuBtn = document.createElement('div')
 		this._featureMenuBtn = document.createElement('div')
-		setStyle(this._itemMenuBtn, BIU_GLOBAL.option.menuBtnStyle, MENU_BTN_STYLE)
-		setStyle(this._featureMenuBtn, BIU_GLOBAL.option.menuBtnStyle, MENU_BTN_STYLE)
+		setStyle(this._itemMenuBtn, BIU_GLOBAL.option.menuBtnStyle, ITEM_BTN_STYLE)
+		setStyle(this._featureMenuBtn, BIU_GLOBAL.option.menuBtnStyle, FEATURE_BTN_STYLE)
 		this._itemMenuBtn.innerHTML = '元素'
 		this._featureMenuBtn.innerHTML = '功能'
 		this._menu.appendChild(this._itemMenuBtn)
@@ -486,11 +480,11 @@
 		})
 		this._svg.addEventListener('drop', function(ev) {
 			ev.preventDefault()
+			var item_name = ev.dataTransfer.getData("text")
 			//计算元素左上顶点的值
 			var svgSize = BIU_GLOBAL.option.svgSize || {}
 			var x = (ev.clientX - self._menu.clientWidth) * (svgSize.width ? svgSize.width : SVG_SIZE.width) / this.clientWidth
 			var y = ev.clientY * (svgSize.height ? svgSize.height : SVG_SIZE.height) / this.clientHeight
-			var item_name = ev.dataTransfer.getData("text")
 			new SVGItem(item_name, x, y)
 		})
 		//点击背景，取消元素的选中
@@ -847,7 +841,7 @@
 			ev.dataTransfer.setData("text/plain", self._key)
 		})
 	}
-
+	
 	//右侧内容的容器类
 	function SVGItem(item_name, x, y) {
 		this.item_name = item_name
@@ -895,8 +889,8 @@
 		})
 		//动态生成右键菜单
 		this._dom.addEventListener('contextmenu', function(ev) {
-			var menuConfig = BIU_GLOBAL.option.menuConfig || ITEM_MENU_CONF
-			var menuItem = menuConfig[self.item_name]
+			var itemMenuConf = BIU_GLOBAL.option.itemMenuConf ? BIU_GLOBAL.option.itemMenuConf : ITEM_MENU_CONF
+			var menuItem = itemMenuConf[self.item_name]
 			//如果该元素配置了右键菜单，则生成并展示
 			if (menuItem.menus && menuItem.menus.length > 0) {
 				//清空原有的右键菜单
@@ -1168,6 +1162,24 @@
 		this._dom.setAttribute('height', this.height)
 	}
 	
+	//初始化biu对象
+	function init(dom) {
+		if (!dom) {
+			throw new Error('没有指定元素')
+		}
+		//全局关闭右键
+		document.oncontextmenu = function() {
+			return false
+		}
+		var biu = new BIU(dom)
+		return biu
+	}
+	
+	//向客户提供创建元素的能力
+	function createItem(item_name, x, y) {
+		return new SVGItem(item_name, x, y)
+	}
+	
 	exports.init = init
-
+	exports.createItem = createItem
 })));
