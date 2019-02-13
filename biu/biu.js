@@ -21,6 +21,25 @@
 		backgroundColor: '#f7f7f7',
 		display: 'flex',
 		flexWrap: 'wrap',
+		justifyContent: 'flex-start',
+		alignItems: 'flex-start',
+		padding: 0
+	}
+	const MENU_BTN_STYLE = {
+		width: '50%',
+		height: '5%',
+		backgroundColor: '#d6d6d6',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+		cursor: 'pointer'
+	}
+	const MENU_SUBMENU_STYLE = {
+		width: '100%',
+		height: '95%',
+		backgroundColor: '#f7f7f7',
+		display: 'flex',
+		flexWrap: 'wrap',
 		justifyContent: 'space-around',
 		alignItems: 'flex-start',
 		boxSizing: 'border-box',
@@ -72,8 +91,8 @@
 		height: 10
 	}
 
-	//默认菜单配置
-	const MENU_CONF = {
+	//默认元素菜单配置
+	const ITEM_MENU_CONF = {
 		chache: {
 			title: '叉车',
 			url: 'http://vanchun.oss-cn-shenzhen.aliyuncs.com/biu/menuItems/chache.svg',
@@ -82,6 +101,7 @@
 				{
 					name: '删除',
 					callBack: function(self) {
+						//可以加入自定义数据处理
 						self.destory()
 					}
 				},
@@ -108,11 +128,7 @@
 				g.appendChild(rect)
 				g.appendChild(img)
 				BIU_GLOBAL.svg.appendChild(g)
-				return {
-					g: g,
-					rect: rect,
-					img: img
-				}
+				return g
 			}
 		},
 		huoxiang: {
@@ -208,6 +224,22 @@
 		}
 	}
 	
+	//默认功能菜单配置
+	const FEATURE_MENU_CONF = [
+		{
+			name: '保存',
+			feature: function() {
+				console.log('保存数据')
+			}
+		},
+		{
+			name: '重置',
+			feature: function() {
+				console.log('重置数据')
+			}
+		}
+	]
+	
 	//默认生命周期
 	const SVG_ITEM_LIFE = {
 		init: function(self) {
@@ -242,17 +274,6 @@
 		styleKeys.forEach(function(styleName) {
 			target.style[styleName] = opt[styleName] ? opt[styleName] : def[styleName]
 		})
-	}
-
-	function param2String(param) {
-		var result = ''
-		if (Object.keys(param).length > 0) {
-			for (var x = 0; x < Object.keys(param).length - 1; x++) {
-				result += Object.keys(param)[x] + '=' + param[Object.keys(param)[x]] + '&'
-			}
-			result += Object.keys(param)[Object.keys(param).length - 1] + '=' + param[Object.keys(param)[Object.keys(param).length -
-				1]]
-		}
 	}
 
 	//各类全局对象
@@ -359,14 +380,42 @@
 	var biuProto = BIU.prototype
 
 	biuProto._initLayout = function() {
+		var self = this
+		//创建菜单对象
 		setStyle(document.getElementsByTagName('body')[0], BIU_GLOBAL.option.pageStyle, PAGE_STYLE)
 		setStyle(this._dom, BIU_GLOBAL.option.biuStyle, BIU_STYLE)
+		//创建menu和body，作为容器
 		this._menu = document.createElement("div")
 		this._body = document.createElement("div")
 		this._dom.appendChild(this._menu)
 		this._dom.appendChild(this._body)
 		setStyle(this._menu, BIU_GLOBAL.option.menuStyle, MENU_STYLE)
 		setStyle(this._body, BIU_GLOBAL.option.bodyStyle, BODY_STYLE)
+		//创建元素菜单和功能菜单的按钮
+		this._itemMenuBtn = document.createElement('div')
+		this._featureMenuBtn = document.createElement('div')
+		setStyle(this._itemMenuBtn, BIU_GLOBAL.option.menuBtnStyle, MENU_BTN_STYLE)
+		setStyle(this._featureMenuBtn, BIU_GLOBAL.option.menuBtnStyle, MENU_BTN_STYLE)
+		this._itemMenuBtn.innerHTML = '元素菜单'
+		this._featureMenuBtn.innerHTML = '功能菜单'
+		this._menu.appendChild(this._itemMenuBtn)
+		this._menu.appendChild(this._featureMenuBtn)
+		this._itemMenu = document.createElement('div')
+		this._featureMenu = document.createElement('div')
+		setStyle(this._itemMenu, BIU_GLOBAL.option.subMenuStyle, MENU_SUBMENU_STYLE)
+		setStyle(this._featureMenu, BIU_GLOBAL.option.subMenuStyle, MENU_SUBMENU_STYLE)
+		self._featureMenu.style.display = 'none'
+		this._menu.appendChild(this._itemMenu)
+		this._menu.appendChild(this._featureMenu)
+		this._itemMenuBtn.addEventListener('click', function() {
+			self._itemMenu.style.display = 'flex'
+			self._featureMenu.style.display = 'none'
+		})
+		this._featureMenuBtn.addEventListener('click', function() {
+			self._itemMenu.style.display = 'none'
+			self._featureMenu.style.display = 'flex'
+		})
+		//创建SVG内容
 		this._svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
 		this._body.appendChild(this._svg)
 		//SVG元素的样式与viewBox
@@ -378,18 +427,30 @@
 		BIU_GLOBAL.svg = this._svg
 	}
 
-	biuProto._initConfig = function() {
+	//item菜单的创建
+	biuProto._initItemMenu = function() {
 		var self = this
-		var menuConf = BIU_GLOBAL.option.menuConf ? BIU_GLOBAL.option.menuConf : MENU_CONF
-		Object.keys(menuConf).forEach(function(key) {
+		var itemMenuConf = BIU_GLOBAL.option.itemMenuConf ? BIU_GLOBAL.option.itemMenuConf : ITEM_MENU_CONF
+		Object.keys(itemMenuConf).forEach(function(key) {
 			//为每一个item创建dom元素，加入页面
-			var item = menuConf[key]
-			self.menuItems.push(new MenuItem(key, item, self._menu))
+			var item = itemMenuConf[key]
+			self.menuItems.push(new MenuItem(key, item, self._itemMenu))
+		})
+	}
+
+	//feature菜单的创建
+	biuProto._initFeatureMenu = function() {
+		var feaureMenuConf = BIU_GLOBAL.option.featureMenuConf || FEATURE_MENU_CONF
+		feaureMenuConf.forEach(feature => {
+			console.log(feature)
 		})
 	}
 
 	biuProto._initSVG = function() {
-		console.log('加载页面元素')
+		var initSVG = BIU_GLOBAL.option.initSVG || function() {
+			console.log('数据加载方法')
+		}
+		initSVG()
 	}
 
 	biuProto._initEvent = function() {
@@ -715,7 +776,9 @@
 		//完成初始页面布局
 		this._initLayout()
 		//完成菜单配置文件的加载
-		this._initConfig()
+		this._initItemMenu()
+		//功能菜单的加载
+		this._initFeatureMenu()
 		//元素的加载
 		this._initSVG()
 		//事件配置
