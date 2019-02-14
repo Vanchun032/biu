@@ -74,8 +74,9 @@
 		backgroundColor: '#333'
 	}
 	const SVG_STYLE = {
-		backgroundColor: '#fff'
+		backgroundColor: '#333'
 	}
+	const CANVAS_COLOR = '#fff'
 	const MENU_ITEM_STYLE = {
 		width: '90px',
 		height: '100px',
@@ -122,8 +123,8 @@
 	}
 	const MSG_STYLE = {
 		position: 'fixed',
-		left: '50%',
-		top: '50%',
+		left: '80%',
+		top: '20%',
 		transform: 'translate(-50%, -50%)',
 		padding: '20px 40px',
 		backgroundColor: '#f7f7f7',
@@ -360,6 +361,11 @@
 						this.area.maxY = item.y + item.height
 					}
 				})
+			},
+			reSize: function() {
+				for (let key in this.dots) {
+					this.dots[key]._resize()
+				}
 			}
 		},
 		mouse: {x: 0, y: 0, setPosition: function(ev) {
@@ -510,8 +516,10 @@
 		this._body.appendChild(this._svg)
 		//SVG元素的样式与viewBox
 		var svgSize = BIU_GLOBAL.option.svgSize || SVG_SIZE
-		this._svg.setAttribute('viewBox', '0 0 ' + (svgSize.width).toString() + ' ' + (
-			svgSize.height).toString()),
+		this._svg.viewBox.baseVal.x = 0
+		this._svg.viewBox.baseVal.y = 0
+		this._svg.viewBox.baseVal.width = svgSize.width
+		this._svg.viewBox.baseVal.height = svgSize.height
 		//根据页面宽高比，设置SVGcss，务必保证不出现滚动条
 		setStyle(this._svg, BIU_GLOBAL.option.svgStyle, SVG_STYLE)
 		//如果屏幕比我更宽
@@ -520,6 +528,14 @@
 		} else {
 			this._svg.style.width = '100%'
 		}
+		//设置背景矩形，标明画布大小
+		var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+		rect.setAttribute('x', 0)
+		rect.setAttribute('y', 0)
+		rect.setAttribute('width', svgSize.width)
+		rect.setAttribute('height', svgSize.height)
+		rect.setAttribute('fill', BIU_GLOBAL.option.canvasColor || CANVAS_COLOR)
+		this._svg.appendChild(rect)
 		//SVG对象应作为辅助点对象的父元素
 		BIU_GLOBAL.svg = this._svg
 	}
@@ -571,20 +587,23 @@
 			ev.preventDefault()
 			var item_name = ev.dataTransfer.getData("text")
 			//计算元素左上顶点的值
-			var svgSize = BIU_GLOBAL.option.svgSize || {}
-			var x = (ev.clientX - self._menu.clientWidth) * (svgSize.width ? svgSize.width : SVG_SIZE.width) / this.clientWidth
-			var y = ev.clientY * (svgSize.height ? svgSize.height : SVG_SIZE.height) / this.clientHeight
+			var ratio = BIU_GLOBAL.zoomQueue.arr[BIU_GLOBAL.zoomQueue.nowZoom].value
+			var svgSize = BIU_GLOBAL.option.svgSize || SVG_SIZE
+			var x = svgSize.width * ratio * ev.offsetX / BIU_GLOBAL.svg.clientWidth
+			var y = svgSize.height * ratio * ev.offsetY / BIU_GLOBAL.svg.clientHeight
 			new SVGItem(item_name, x, y)
 		})
-		//点击背景，取消元素的选中
 		this._svg.addEventListener('mousedown', function() {
+			//点击背景，取消元素的选中
 			BIU_GLOBAL.checkedSVGItem.forEach(item => {
 				item.uncheckThis()
 			})
 			BIU_GLOBAL.checkedSVGItem = []
 			BIU_GLOBAL.checkedAUX.cleanDots()
+			//背景板可以取消右键菜单
+			BIU_GLOBAL.contextMenu.hide()
 		})
-		//鼠标抬起时，取消所有位移事件
+		//鼠标抬起时或经过body时
 		this._svg.addEventListener('mouseover', function(ev) {
 			ev.stopPropagation()
 		})
@@ -610,32 +629,56 @@
 			self._svg.removeEventListener('mousemove', bottomMiddleZoom)
 			self._svg.removeEventListener('mousemove', bottomRightZoom)
 		})
-		//背景板可以取消右键菜单
-		this._svg.addEventListener('mousedown', function() {
-			BIU_GLOBAL.contextMenu.hide()
-		})
 		//滚轮事件，处理缩放
 		this._body.addEventListener('wheel', function(ev) {
 			if (ev.deltaY < 0) {
 				if (BIU_GLOBAL.zoomQueue.nowZoom < BIU_GLOBAL.zoomQueue.arr.length - 1) {
 					BIU_GLOBAL.zoomQueue.nowZoom += 1
 					zoomSVG()
+					BIU_GLOBAL.checkedAUX.reSize()
 				}
 			} else {
 				if (BIU_GLOBAL.zoomQueue.nowZoom > 0) {
 					BIU_GLOBAL.zoomQueue.nowZoom -= 1
 					zoomSVG()
+					BIU_GLOBAL.checkedAUX.reSize()
 				}
 			}
 		})
+		//整页拖拽的开始和结束
+		this._svg.addEventListener('mousedown', function(ev) {
+			BIU_GLOBAL.mouse.setPosition(ev)
+			this.addEventListener('mousemove', dragAll)
+		})
+		this._body.addEventListener('mouseover', function() {
+			self._svg.removeEventListener('mousemove', dragAll)
+		})
+		this._body.addEventListener('mouseup', function() {
+			self._svg.removeEventListener('mousemove', dragAll)
+		})
+	}
+	
+	function dragAll(ev) {
+		//计算x与y的位移量
+		var offsetX = ev.offsetX - BIU_GLOBAL.mouse.x
+		var offsetY = ev.offsetY - BIU_GLOBAL.mouse.y
+		BIU_GLOBAL.mouse.x = ev.offsetX
+		BIU_GLOBAL.mouse.y = ev.offsetY
+		//计算背景实际需要移动的距离
+		var move = getMoveXY(offsetX, offsetY)
+		var xMove = move.x
+		var yMove = move.y
+		//让背景动起来
+		this.viewBox.baseVal.x -= xMove
+		this.viewBox.baseVal.y -= yMove
 	}
 	
 	//全局缩放事件，重计算viewBox
 	function zoomSVG() {
-		var value = BIU_GLOBAL.zoomQueue.arr[BIU_GLOBAL.zoomQueue.nowZoom].value
+		var ratio = BIU_GLOBAL.zoomQueue.arr[BIU_GLOBAL.zoomQueue.nowZoom].value
 		var svgSize = BIU_GLOBAL.option.svgSize || SVG_SIZE
-		BIU_GLOBAL.svg.setAttribute('viewBox', '0 0 ' + (svgSize.width * value).toString() + ' ' + (
-			svgSize.height * value).toString())
+		BIU_GLOBAL.svg.viewBox.baseVal.width = svgSize.width * ratio
+		BIU_GLOBAL.svg.viewBox.baseVal.height = svgSize.height * ratio
 		biuMsg('当前缩放比例:' + BIU_GLOBAL.zoomQueue.arr[BIU_GLOBAL.zoomQueue.nowZoom].name)
 	}
 	
@@ -660,9 +703,9 @@
 		BIU_GLOBAL.mouse.x = ev.offsetX
 		BIU_GLOBAL.mouse.y = ev.offsetY
 		//计算元素实际需要移动的距离
-		var svgSize = BIU_GLOBAL.option.svgSize || {}
-		var xMove = offsetX * (svgSize.width ? svgSize.width : SVG_SIZE.width) / BIU_GLOBAL.svg.clientWidth
-		var yMove = offsetY * (svgSize.height ? svgSize.height : SVG_SIZE.height) / BIU_GLOBAL.svg.clientHeight
+		var move = getMoveXY(offsetX, offsetY)
+		var xMove = move.x
+		var yMove = move.y
 		//使每一个元素也移动同样的距离
 		BIU_GLOBAL.checkedSVGItem.forEach(item => {
 			item.x = item.x + xMove
@@ -684,9 +727,9 @@
 		BIU_GLOBAL.mouse.x = ev.offsetX
 		BIU_GLOBAL.mouse.y = ev.offsetY
 		//计算元素实际需要移动的距离
-		var svgSize = BIU_GLOBAL.option.svgSize || {}
-		var xMove = offsetX * (svgSize.width ? svgSize.width : SVG_SIZE.width) / BIU_GLOBAL.svg.clientWidth
-		var yMove = offsetY * (svgSize.height ? svgSize.height : SVG_SIZE.height) / BIU_GLOBAL.svg.clientHeight
+		var move = getMoveXY(offsetX, offsetY)
+		var xMove = move.x
+		var yMove = move.y
 		//缩放当前元素,重新计算x,y,width,heigth
 		BIU_GLOBAL.checkedSVGItem.forEach(item => {
 			item.x = item.x + xMove
@@ -715,9 +758,9 @@
 		BIU_GLOBAL.mouse.x = ev.offsetX
 		BIU_GLOBAL.mouse.y = ev.offsetY
 		//计算元素实际需要移动的距离
-		var svgSize = BIU_GLOBAL.option.svgSize || {}
-		var xMove = offsetX * (svgSize.width ? svgSize.width : SVG_SIZE.width) / BIU_GLOBAL.svg.clientWidth
-		var yMove = offsetY * (svgSize.height ? svgSize.height : SVG_SIZE.height) / BIU_GLOBAL.svg.clientHeight
+		var move = getMoveXY(offsetX, offsetY)
+		var xMove = move.x
+		var yMove = move.y
 		//缩放当前元素,重新计算x,y,width,heigth
 		BIU_GLOBAL.checkedSVGItem.forEach(item => {
 			item.y = item.y + yMove
@@ -741,9 +784,9 @@
 		BIU_GLOBAL.mouse.x = ev.offsetX
 		BIU_GLOBAL.mouse.y = ev.offsetY
 		//计算元素实际需要移动的距离
-		var svgSize = BIU_GLOBAL.option.svgSize || {}
-		var xMove = offsetX * (svgSize.width ? svgSize.width : SVG_SIZE.width) / BIU_GLOBAL.svg.clientWidth
-		var yMove = offsetY * (svgSize.height ? svgSize.height : SVG_SIZE.height) / BIU_GLOBAL.svg.clientHeight
+		var move = getMoveXY(offsetX, offsetY)
+		var xMove = move.x
+		var yMove = move.y
 		//缩放当前元素,重新计算x,y,width,heigth
 		BIU_GLOBAL.checkedSVGItem.forEach(item => {
 			//缩小的移动不可越界
@@ -773,9 +816,9 @@
 		BIU_GLOBAL.mouse.x = ev.offsetX
 		BIU_GLOBAL.mouse.y = ev.offsetY
 		//计算元素实际需要移动的距离
-		var svgSize = BIU_GLOBAL.option.svgSize || {}
-		var xMove = offsetX * (svgSize.width ? svgSize.width : SVG_SIZE.width) / BIU_GLOBAL.svg.clientWidth
-		var yMove = offsetY * (svgSize.height ? svgSize.height : SVG_SIZE.height) / BIU_GLOBAL.svg.clientHeight
+		var move = getMoveXY(offsetX, offsetY)
+		var xMove = move.x
+		var yMove = move.y
 		//缩放当前元素,重新计算x,y,width,heigth
 		BIU_GLOBAL.checkedSVGItem.forEach(item => {
 			//缩小的移动不可越界
@@ -801,9 +844,9 @@
 		BIU_GLOBAL.mouse.x = ev.offsetX
 		BIU_GLOBAL.mouse.y = ev.offsetY
 		//计算元素实际需要移动的距离
-		var svgSize = BIU_GLOBAL.option.svgSize || {}
-		var xMove = offsetX * (svgSize.width ? svgSize.width : SVG_SIZE.width) / BIU_GLOBAL.svg.clientWidth
-		var yMove = offsetY * (svgSize.height ? svgSize.height : SVG_SIZE.height) / BIU_GLOBAL.svg.clientHeight
+		var move = getMoveXY(offsetX, offsetY)
+		var xMove = move.x
+		var yMove = move.y
 		//缩放当前元素,重新计算x,y,width,heigth
 		BIU_GLOBAL.checkedSVGItem.forEach(item => {
 			//缩小的移动不可越界
@@ -829,9 +872,9 @@
 		BIU_GLOBAL.mouse.x = ev.offsetX
 		BIU_GLOBAL.mouse.y = ev.offsetY
 		//计算元素实际需要移动的距离
-		var svgSize = BIU_GLOBAL.option.svgSize || {}
-		var xMove = offsetX * (svgSize.width ? svgSize.width : SVG_SIZE.width) / BIU_GLOBAL.svg.clientWidth
-		var yMove = offsetY * (svgSize.height ? svgSize.height : SVG_SIZE.height) / BIU_GLOBAL.svg.clientHeight
+		var move = getMoveXY(offsetX, offsetY)
+		var xMove = move.x
+		var yMove = move.y
 		//缩放当前元素,重新计算x,y,width,heigth
 		BIU_GLOBAL.checkedSVGItem.forEach(item => {
 			item.x = item.x + xMove
@@ -862,9 +905,9 @@
 		BIU_GLOBAL.mouse.x = ev.offsetX
 		BIU_GLOBAL.mouse.y = ev.offsetY
 		//计算元素实际需要移动的距离
-		var svgSize = BIU_GLOBAL.option.svgSize || {}
-		var xMove = offsetX * (svgSize.width ? svgSize.width : SVG_SIZE.width) / BIU_GLOBAL.svg.clientWidth
-		var yMove = offsetY * (svgSize.height ? svgSize.height : SVG_SIZE.height) / BIU_GLOBAL.svg.clientHeight
+		var move = getMoveXY(offsetX, offsetY)
+		var xMove = move.x
+		var yMove = move.y
 		//缩放当前元素,重新计算x,y,width,heigth
 		BIU_GLOBAL.checkedSVGItem.forEach(item => {
 			if (item.height + yMove >= 20) {
@@ -889,9 +932,9 @@
 		BIU_GLOBAL.mouse.x = ev.offsetX
 		BIU_GLOBAL.mouse.y = ev.offsetY
 		//计算元素实际需要移动的距离
-		var svgSize = BIU_GLOBAL.option.svgSize || {}
-		var xMove = offsetX * (svgSize.width ? svgSize.width : SVG_SIZE.width) / BIU_GLOBAL.svg.clientWidth
-		var yMove = offsetY * (svgSize.height ? svgSize.height : SVG_SIZE.height) / BIU_GLOBAL.svg.clientHeight
+		var move = getMoveXY(offsetX, offsetY)
+		var xMove = move.x
+		var yMove = move.y
 		//缩放当前元素,重新计算x,y,width,heigth
 		BIU_GLOBAL.checkedSVGItem.forEach(item => {
 			//缩小的移动不可越界
@@ -911,6 +954,16 @@
 		BIU_GLOBAL.checkedAUX.reArea()
 		for (let key in BIU_GLOBAL.checkedAUX.dots) {
 			BIU_GLOBAL.checkedAUX.dots[key]._resize()
+		}
+	}
+	
+	function getMoveXY(offsetX, offsetY) {
+		//计算元素实际需要移动的距离
+		var ratio = BIU_GLOBAL.zoomQueue.arr[BIU_GLOBAL.zoomQueue.nowZoom].value
+		var svgSize = BIU_GLOBAL.option.svgSize || SVG_SIZE
+		return {
+			x: offsetX * (svgSize.width * ratio) / BIU_GLOBAL.svg.clientWidth,
+			y: offsetY * (svgSize.height * ratio) / BIU_GLOBAL.svg.clientHeight
 		}
 	}
 	
@@ -1120,9 +1173,10 @@
 			BIU_GLOBAL.svg.removeChild(this._dom)
 		},
 		this._getSize = function() {
-			var auxItemSize = BIU_GLOBAL.option.auxItemSize || {}
-			this.width = auxItemSize.width ? auxItemSize.width : AUX_ITEM_SIZE.width
-			this.height = auxItemSize.height ? auxItemSize.height : AUX_ITEM_SIZE.height
+			var auxItemSize = BIU_GLOBAL.option.auxItemSize || AUX_ITEM_SIZE
+			//不管缩放，永远保持展示大小的一致
+			this.width = auxItemSize.width * BIU_GLOBAL.zoomQueue.arr[BIU_GLOBAL.zoomQueue.nowZoom].value
+			this.height = auxItemSize.height * BIU_GLOBAL.zoomQueue.arr[BIU_GLOBAL.zoomQueue.nowZoom].value
 		},
 		this._initDom = function() {
 			var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
