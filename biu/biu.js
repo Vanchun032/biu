@@ -120,6 +120,15 @@
 		width: 10,
 		height: 10
 	}
+	const MSG_STYLE = {
+		position: 'fixed',
+		left: '50%',
+		top: '50%',
+		transform: 'translate(-50%, -50%)',
+		padding: '20px 40px',
+		backgroundColor: '#f7f7f7',
+		color: '#333333'
+	}
 
 	//默认元素菜单配置
 	const ITEM_MENU_CONF = {
@@ -627,7 +636,17 @@
 		var svgSize = BIU_GLOBAL.option.svgSize || SVG_SIZE
 		BIU_GLOBAL.svg.setAttribute('viewBox', '0 0 ' + (svgSize.width * value).toString() + ' ' + (
 			svgSize.height * value).toString())
-		console.log(BIU_GLOBAL.zoomQueue.arr[BIU_GLOBAL.zoomQueue.nowZoom].name)
+		biuMsg('当前缩放比例:' + BIU_GLOBAL.zoomQueue.arr[BIU_GLOBAL.zoomQueue.nowZoom].name)
+	}
+	
+	function biuMsg(msg) {
+		var div = document.createElement('div')
+		div.innerHTML = msg
+		setStyle(div, BIU_GLOBAL.option.msgStyle, MSG_STYLE)
+		document.getElementsByTagName('body')[0].appendChild(div)
+		setTimeout(function() {
+			div.parentNode.removeChild(div)
+		}, 2000)
 	}
 
 	/**
