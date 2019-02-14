@@ -74,7 +74,6 @@
 		backgroundColor: '#333'
 	}
 	const SVG_STYLE = {
-		width: '100%',
 		backgroundColor: '#fff'
 	}
 	const MENU_ITEM_STYLE = {
@@ -150,16 +149,15 @@
 				}
 			],
 			//自定义init事件
-			init : function(self) {
-				var itemMenuConf = getItemMenuConf()
+			init : function(self, itemMenu, svg) {
 				var g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
 				var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-				rect.setAttribute('fill', itemMenuConf[self.item_name].color)
+				rect.setAttribute('fill', itemMenu[self.item_name].color)
 				var img = document.createElementNS('http://www.w3.org/2000/svg', 'image')
-				img.href.baseVal = itemMenuConf[self.item_name].url
+				img.href.baseVal = itemMenu[self.item_name].url
 				g.appendChild(rect)
 				g.appendChild(img)
-				BIU_GLOBAL.svg.appendChild(g)
+				svg.appendChild(g)
 				return g
 			}
 		},
@@ -383,6 +381,72 @@
 					this.dom.style.right = (document.documentElement.clientWidth - x) + 'px'
 				}
 			}
+		},
+		//缩放队列，定义可行的缩放比例
+		zoomQueue: {
+			nowZoom = 7
+			arr: [
+				{
+					name: '25%',
+					value: 4
+				},
+				{
+					name: '33%',
+					value: 3.03
+				},
+				{
+					name: '50%',
+					value: 2
+				},
+				{
+					name: '67%',
+					value: 1.49
+				},
+				{
+					name: '75%',
+					value: 1.33
+				},
+				{
+					name: '80%',
+					value: 1.25
+				},
+				{
+					name: '90%',
+					value: 1.11
+				},
+				{
+					name: '100%',
+					value: 1
+				},
+				{
+					name: '110%',
+					value: 0.91
+				},
+				{
+					name: '125%',
+					value: 0.8
+				},
+				{
+					name: '150%',
+					value: 0.67
+				},
+				{
+					name: '175%',
+					value: 0.57
+				},
+				{
+					name: '200%',
+					value: 0.5
+				},
+				{
+					name: '250%',
+					value: 0.4
+				},
+				{
+					name: '300%',
+					value: 0.33
+				}
+			]
 		}
 	}
 	
@@ -436,10 +500,17 @@
 		this._svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
 		this._body.appendChild(this._svg)
 		//SVG元素的样式与viewBox
-		var svgSize = BIU_GLOBAL.option.svgSize || {}
-		this._svg.setAttribute('viewBox', '0 0 ' + (svgSize.width ? svgSize.width : SVG_SIZE.width).toString() + ' ' + (
-			svgSize.height ? svgSize.height : SVG_SIZE.height).toString())
+		var svgSize = BIU_GLOBAL.option.svgSize || SVG_SIZE
+		this._svg.setAttribute('viewBox', '0 0 ' + (svgSize.width).toString() + ' ' + (
+			svgSize.height).toString()),
+		//根据页面宽高比，设置SVGcss，务必保证不出现滚动条
 		setStyle(this._svg, BIU_GLOBAL.option.svgStyle, SVG_STYLE)
+		//如果屏幕比我更宽
+		if (document.body.clientWidth / document.body.clientHeight > svgSize.width / svgSize.height) {
+			this._svg.style.height = '100%'
+		} else {
+			this._svg.style.width = '100%'
+		}
 		//SVG对象应作为辅助点对象的父元素
 		BIU_GLOBAL.svg = this._svg
 	}
@@ -505,16 +576,30 @@
 			BIU_GLOBAL.checkedAUX.cleanDots()
 		})
 		//鼠标抬起时，取消所有位移事件
-		this._svg.addEventListener('mouseup', function() {
-			this.removeEventListener('mousemove', itemMove)
-			this.removeEventListener('mousemove', topLeftZoom)
-			this.removeEventListener('mousemove', topMiddleZoom)
-			this.removeEventListener('mousemove', topRightZoom)
-			this.removeEventListener('mousemove', middleLeftZoom)
-			this.removeEventListener('mousemove', middleRightZoom)
-			this.removeEventListener('mousemove', bottomLeftZoom)
-			this.removeEventListener('mousemove', bottomMiddleZoom)
-			this.removeEventListener('mousemove', bottomRightZoom)
+		this._svg.addEventListener('mouseover', function(ev) {
+			ev.stopPropagation()
+		})
+		this._body.addEventListener('mouseover', function() {
+			self._svg.removeEventListener('mousemove', itemMove)
+			self._svg.removeEventListener('mousemove', topLeftZoom)
+			self._svg.removeEventListener('mousemove', topMiddleZoom)
+			self._svg.removeEventListener('mousemove', topRightZoom)
+			self._svg.removeEventListener('mousemove', middleLeftZoom)
+			self._svg.removeEventListener('mousemove', middleRightZoom)
+			self._svg.removeEventListener('mousemove', bottomLeftZoom)
+			self._svg.removeEventListener('mousemove', bottomMiddleZoom)
+			self._svg.removeEventListener('mousemove', bottomRightZoom)
+		})
+		this._body.addEventListener('mouseup', function() {
+			self._svg.removeEventListener('mousemove', itemMove)
+			self._svg.removeEventListener('mousemove', topLeftZoom)
+			self._svg.removeEventListener('mousemove', topMiddleZoom)
+			self._svg.removeEventListener('mousemove', topRightZoom)
+			self._svg.removeEventListener('mousemove', middleLeftZoom)
+			self._svg.removeEventListener('mousemove', middleRightZoom)
+			self._svg.removeEventListener('mousemove', bottomLeftZoom)
+			self._svg.removeEventListener('mousemove', bottomMiddleZoom)
+			self._svg.removeEventListener('mousemove', bottomRightZoom)
 		})
 		//背景板可以取消右键菜单
 		this._svg.addEventListener('mousedown', function() {
@@ -857,9 +942,10 @@
 		this.x = x
 		this.y = y
 		this.checked = false
-		var svgItemSize = BIU_GLOBAL.option.svgItemSize || {}
-		this.width = svgItemSize.width ? svgItemSize.width : SVG_ITEM_SIZE.width
-		this.height = svgItemSize.height ? svgItemSize.height : SVG_ITEM_SIZE.height,
+		var itemMenuConf = getItemMenuConf()
+		var svgItemSize = itemMenuConf[item_name].size || SVG_ITEM_SIZE
+		this.width = svgItemSize.width
+		this.height = svgItemSize.height
 		this.data = data || {}
 		this._dom = this._initDom()
 		this._initEvent()
