@@ -384,7 +384,7 @@
 		},
 		//缩放队列，定义可行的缩放比例
 		zoomQueue: {
-			nowZoom = 7
+			nowZoom: 7,
 			arr: [
 				{
 					name: '25%',
@@ -605,6 +605,29 @@
 		this._svg.addEventListener('mousedown', function() {
 			BIU_GLOBAL.contextMenu.hide()
 		})
+		//滚轮事件，处理缩放
+		this._body.addEventListener('wheel', function(ev) {
+			if (ev.deltaY < 0) {
+				if (BIU_GLOBAL.zoomQueue.nowZoom < BIU_GLOBAL.zoomQueue.arr.length - 1) {
+					BIU_GLOBAL.zoomQueue.nowZoom += 1
+					zoomSVG()
+				}
+			} else {
+				if (BIU_GLOBAL.zoomQueue.nowZoom > 0) {
+					BIU_GLOBAL.zoomQueue.nowZoom -= 1
+					zoomSVG()
+				}
+			}
+		})
+	}
+	
+	//全局缩放事件，重计算viewBox
+	function zoomSVG() {
+		var value = BIU_GLOBAL.zoomQueue.arr[BIU_GLOBAL.zoomQueue.nowZoom].value
+		var svgSize = BIU_GLOBAL.option.svgSize || SVG_SIZE
+		BIU_GLOBAL.svg.setAttribute('viewBox', '0 0 ' + (svgSize.width * value).toString() + ' ' + (
+			svgSize.height * value).toString())
+		console.log(BIU_GLOBAL.zoomQueue.arr[BIU_GLOBAL.zoomQueue.nowZoom].name)
 	}
 
 	/**
