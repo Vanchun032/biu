@@ -235,6 +235,285 @@
 		}
 	}
 
+	//默认缩放事件
+	const AUX_ITEM_ZOOM = {
+		topLeftZoom: function (ev) {
+			//计算x与y的位移量
+			var offsetX = ev.offsetX - BIU_GLOBAL.mouse.x
+			var offsetY = ev.offsetY - BIU_GLOBAL.mouse.y
+			BIU_GLOBAL.mouse.x = ev.offsetX
+			BIU_GLOBAL.mouse.y = ev.offsetY
+			//计算元素实际需要移动的距离
+			var vector = getMoveXY(offsetX, offsetY)
+			//缩放当前元素,重新计算x,y,width,heigth
+			BIU_GLOBAL.checkedSVGItem.forEach(item => {
+				if (item.rotate == 0 || Math.abs(item.rotate) == 180) {
+					item.x = item.x + vector.x
+					item.y = item.y + vector.y
+					//缩小的移动不可越界
+					if (item.width - vector.x >= 20) {
+						item.width = item.width - vector.x
+					}
+					if (item.height - vector.y >= 20) {
+						item.height = item.height - vector.y
+					}
+				} else if (Math.abs(item.rotate) == 90 || Math.abs(item.rotate) == 270) {
+					//缩小的移动不可越界
+					if (item.width - vector.y >= 20) {
+						item.width = item.width - vector.y
+						item.x = item.x + (vector.x + vector.y) / 2
+					}
+					if (item.height - vector.x >= 20) {
+						item.height = item.height - vector.x
+						item.y = item.y + (vector.x + vector.y) / 2
+					}
+				}
+				item._resize()
+			})
+			//使辅助点也跟着移动
+			BIU_GLOBAL.checkedAUX.reLocate()
+		},
+		topMiddleZoom: function(ev) {
+			//计算x与y的位移量
+			var offsetX = ev.offsetX - BIU_GLOBAL.mouse.x
+			var offsetY = ev.offsetY - BIU_GLOBAL.mouse.y
+			BIU_GLOBAL.mouse.x = ev.offsetX
+			BIU_GLOBAL.mouse.y = ev.offsetY
+			//计算元素实际需要移动的距离
+			var vector = getMoveXY(offsetX, offsetY)
+			//缩放当前元素,重新计算x,y,width,heigth
+			BIU_GLOBAL.checkedSVGItem.forEach(item => {
+				if (item.rotate == 0 || Math.abs(item.rotate) == 180) {
+					item.y = item.y + vector.y
+					if (item.height - vector.y >= 20) {
+						item.height = item.height - vector.y
+					}
+				} else if (Math.abs(item.rotate) == 90 || Math.abs(item.rotate) == 270) {
+					//缩小的移动不可越界
+					if (item.width - vector.y >= 20) {
+						item.width = item.width - vector.y
+						item.y = item.y + vector.y / 2
+						item.x = item.x + vector.y / 2
+					} else {
+						item.y = item.y + vector.y
+					}
+				}
+				item._resize()
+			})
+			//使辅助点也跟着移动
+			BIU_GLOBAL.checkedAUX.reLocate()
+		},
+		topRightZoom: function(ev) {
+			//计算x与y的位移量
+			var offsetX = ev.offsetX - BIU_GLOBAL.mouse.x
+			var offsetY = ev.offsetY - BIU_GLOBAL.mouse.y
+			BIU_GLOBAL.mouse.x = ev.offsetX
+			BIU_GLOBAL.mouse.y = ev.offsetY
+			//计算元素实际需要移动的距离
+			var vector = getMoveXY(offsetX, offsetY)
+			//缩放当前元素,重新计算x,y,width,heigth
+			BIU_GLOBAL.checkedSVGItem.forEach(item => {
+				if (item.rotate == 0 || Math.abs(item.rotate) == 180) {
+					//缩小的移动不可越界
+					if (item.width + vector.x >= 20) {
+						item.width = item.width + vector.x
+					} else {
+						item.x = item.x + vector.x
+					}
+					if (item.height - vector.y >= 20) {
+						item.height = item.height - vector.y
+					}
+					item.y = item.y + vector.y
+				} else if (Math.abs(item.rotate) == 90 || Math.abs(item.rotate) == 270) {
+					//缩小的移动不可越界
+					if (item.width - vector.y >= 20) {
+						item.width = item.width - vector.y
+						item.x = item.x + (vector.x + vector.y) / 2
+					}
+					if (item.height + vector.x >= 20) {
+						item.height = item.height + vector.x
+						item.y = item.y - (vector.x - vector.y) / 2
+					}
+				}
+				item._resize()
+			})
+			//使辅助点也跟着移动
+			BIU_GLOBAL.checkedAUX.reLocate()
+		},
+		middleLeftZoom: function(ev) {
+			//计算x与y的位移量
+			var offsetX = ev.offsetX - BIU_GLOBAL.mouse.x
+			var offsetY = ev.offsetY - BIU_GLOBAL.mouse.y
+			BIU_GLOBAL.mouse.x = ev.offsetX
+			BIU_GLOBAL.mouse.y = ev.offsetY
+			//计算元素实际需要移动的距离
+			var vector = getMoveXY(offsetX, offsetY)
+			//缩放当前元素,重新计算x,y,width,heigth
+			BIU_GLOBAL.checkedSVGItem.forEach(item => {
+				if (item.rotate == 0 || Math.abs(item.rotate) == 180) {
+					//缩小的移动不可越界
+					item.x = item.x + vector.x
+					//缩小的移动不可越界
+					if (item.width - vector.x >= 20) {
+						item.width = item.width - vector.x
+					}
+				} else if (Math.abs(item.rotate) == 90 || Math.abs(item.rotate) == 270) {
+					//缩小的移动不可越界
+					if (item.height - vector.x >= 20) {
+						item.height = item.height - vector.x
+						item.y = item.y + vector.x / 2
+						item.x = item.x + vector.x / 2
+					} else {
+						item.x = item.x + vector.x
+					}
+				}
+				item._resize()
+			})
+			//使辅助点也跟着移动
+			BIU_GLOBAL.checkedAUX.reLocate()
+		},
+		middleRightZoom: function(ev) {
+			//计算x与y的位移量
+			var offsetX = ev.offsetX - BIU_GLOBAL.mouse.x
+			var offsetY = ev.offsetY - BIU_GLOBAL.mouse.y
+			BIU_GLOBAL.mouse.x = ev.offsetX
+			BIU_GLOBAL.mouse.y = ev.offsetY
+			//计算元素实际需要移动的距离
+			var vector = getMoveXY(offsetX, offsetY)
+			//缩放当前元素,重新计算x,y,width,heigth
+			BIU_GLOBAL.checkedSVGItem.forEach(item => {
+				if (item.rotate == 0 || Math.abs(item.rotate) == 180) {
+					//缩小的移动不可越界
+					if (item.width + vector.x >= 20) {
+						item.width = item.width + vector.x
+					} else {
+						item.x = item.x + vector.x
+					}
+				} else if (Math.abs(item.rotate) == 90 || Math.abs(item.rotate) == 270) {
+					//缩小的移动不可越界
+					if (item.height + vector.x >= 20) {
+						item.height = item.height + vector.x
+						item.y = item.y - vector.x / 2
+						item.x = item.x + vector.x / 2
+					} else {
+						item.x = item.x + vector.x
+					}
+				}
+				item._resize()
+			})
+			//使辅助点也跟着移动
+			BIU_GLOBAL.checkedAUX.reLocate()
+		},
+		bottomLeftZoom: function(ev) {
+			//计算x与y的位移量
+			var offsetX = ev.offsetX - BIU_GLOBAL.mouse.x
+			var offsetY = ev.offsetY - BIU_GLOBAL.mouse.y
+			BIU_GLOBAL.mouse.x = ev.offsetX
+			BIU_GLOBAL.mouse.y = ev.offsetY
+			//计算元素实际需要移动的距离
+			var vector = getMoveXY(offsetX, offsetY)
+			//缩放当前元素,重新计算x,y,width,heigth
+			BIU_GLOBAL.checkedSVGItem.forEach(item => {
+				if (item.rotate == 0 || Math.abs(item.rotate) == 180) {
+					item.x = item.x + vector.x
+					//缩小的移动不可越界
+					if (item.width - vector.x >= 20) {
+						item.width = item.width - vector.x
+					}
+					
+					if (item.height + vector.y >= 20) {
+						item.height = item.height + vector.y
+					} else {
+						item.y = item.y + vector.y
+					}
+				} else if (Math.abs(item.rotate) == 90 || Math.abs(item.rotate) == 270) {
+					//缩小的移动不可越界
+					if (item.width + vector.y >= 20) {
+						item.width = item.width + vector.y
+						item.x = item.x + (vector.x - vector.y)/2
+					}
+					if (item.height - vector.x >= 20) {
+						item.height = item.height - vector.x
+						item.y = item.y + (vector.x + vector.y)/2
+					}
+				}
+				item._resize()
+			})
+			//使辅助点也跟着移动
+			BIU_GLOBAL.checkedAUX.reLocate()
+		},
+		bottomMiddleZoom: function(ev) {
+			//计算x与y的位移量
+			var offsetX = ev.offsetX - BIU_GLOBAL.mouse.x
+			var offsetY = ev.offsetY - BIU_GLOBAL.mouse.y
+			BIU_GLOBAL.mouse.x = ev.offsetX
+			BIU_GLOBAL.mouse.y = ev.offsetY
+			//计算元素实际需要移动的距离
+			var vector = getMoveXY(offsetX, offsetY)
+			//缩放当前元素,重新计算x,y,width,heigth
+			BIU_GLOBAL.checkedSVGItem.forEach(item => {
+				if (item.rotate == 0 || Math.abs(item.rotate) == 180) {
+					if (item.height + vector.y >= 20) {
+						item.height = item.height + vector.y
+					} else {
+						item.y = item.y + vector.y
+					}
+				} else if (Math.abs(item.rotate) == 90 || Math.abs(item.rotate) == 270) {
+					//缩小的移动不可越界
+					if (item.width + vector.y >= 20) {
+						item.width = item.width + vector.y
+						item.x = item.x - vector.y/2
+						item.y = item.y + vector.y/2
+					} else {
+						item.y = item.y + vector.y
+					}
+				}
+				item._resize()
+			})
+			//使辅助点也跟着移动
+			BIU_GLOBAL.checkedAUX.reLocate()
+		},
+		bottomRightZoom: function(ev) {
+			//计算x与y的位移量
+			var offsetX = ev.offsetX - BIU_GLOBAL.mouse.x
+			var offsetY = ev.offsetY - BIU_GLOBAL.mouse.y
+			BIU_GLOBAL.mouse.x = ev.offsetX
+			BIU_GLOBAL.mouse.y = ev.offsetY
+			//计算元素实际需要移动的距离
+			var vector = getMoveXY(offsetX, offsetY)
+			//缩放当前元素,重新计算x,y,width,heigth
+			BIU_GLOBAL.checkedSVGItem.forEach(item => {
+				if (item.rotate == 0 || Math.abs(item.rotate) == 180) {
+					//缩小的移动不可越界
+					if (item.width + vector.x >= 20) {
+						item.width = item.width + vector.x
+					} else {
+						item.x = item.x + vector.x
+					}
+					if (item.height + vector.y >= 20) {
+						item.height = item.height + vector.y
+					} else {
+						item.y = item.y + vector.y
+					}
+				} else if (Math.abs(item.rotate) == 90 || Math.abs(item.rotate) == 270) {
+					//缩小的移动不可越界
+					if (item.width + vector.y >= 20) {
+						item.width = item.width + vector.y
+						item.x = item.x + (vector.x - vector.y)/2
+					}
+					if (item.height + vector.x >= 20) {
+						item.height = item.height + vector.x
+						item.y = item.y - (vector.x - vector.y)/2
+						item.y = item.y + (vector.x + vector.y)/2
+					}
+				}
+				item._resize()
+			})
+			//使辅助点也跟着移动
+			BIU_GLOBAL.checkedAUX.reLocate()
+		}
+	}
+
 	//处理用户style的个性配置
 	function setStyle(target, opt, def) {
 		opt = opt || {}
@@ -668,292 +947,66 @@
 	
 	//单个元素的缩放事件，左上
 	function topLeftZoom(ev) {
-		//计算x与y的位移量
-		var offsetX = ev.offsetX - BIU_GLOBAL.mouse.x
-		var offsetY = ev.offsetY - BIU_GLOBAL.mouse.y
-		BIU_GLOBAL.mouse.x = ev.offsetX
-		BIU_GLOBAL.mouse.y = ev.offsetY
-		//计算元素实际需要移动的距离
-		var vector = getMoveXY(offsetX, offsetY)
-		//缩放当前元素,重新计算x,y,width,heigth
-		BIU_GLOBAL.checkedSVGItem.forEach(item => {
-			if (item.rotate == 0 || Math.abs(item.rotate) == 180) {
-				item.x = item.x + vector.x
-				item.y = item.y + vector.y
-				//缩小的移动不可越界
-				if (item.width - vector.x >= 20) {
-					item.width = item.width - vector.x
-				}
-				if (item.height - vector.y >= 20) {
-					item.height = item.height - vector.y
-				}
-			} else if (Math.abs(item.rotate) == 90 || Math.abs(item.rotate) == 270) {
-				//缩小的移动不可越界
-				if (item.width - vector.y >= 20) {
-					item.width = item.width - vector.y
-					item.x = item.x + (vector.x + vector.y) / 2
-				}
-				if (item.height - vector.x >= 20) {
-					item.height = item.height - vector.x
-					item.y = item.y + (vector.x + vector.y) / 2
-				}
-			}
-			item._resize()
-		})
-		//使辅助点也跟着移动
-		BIU_GLOBAL.checkedAUX.reLocate()
+		var menuConf = getItemMenuConf()
+		//当前元素自定义的缩放事件，或用户自定义的全局缩放事件，或默认缩放事件
+		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].topLeftZoom || BIU_GLOBAL.option.auxItemZoom.topLeftZoom || AUX_ITEM_ZOOM.topLeftZoom
+		fun(ev)
 	}
 	
 	//单个元素的缩放事件，中上
 	function topMiddleZoom(ev) {
-		//计算x与y的位移量
-		var offsetX = ev.offsetX - BIU_GLOBAL.mouse.x
-		var offsetY = ev.offsetY - BIU_GLOBAL.mouse.y
-		BIU_GLOBAL.mouse.x = ev.offsetX
-		BIU_GLOBAL.mouse.y = ev.offsetY
-		//计算元素实际需要移动的距离
-		var vector = getMoveXY(offsetX, offsetY)
-		//缩放当前元素,重新计算x,y,width,heigth
-		BIU_GLOBAL.checkedSVGItem.forEach(item => {
-			if (item.rotate == 0 || Math.abs(item.rotate) == 180) {
-				item.y = item.y + vector.y
-				if (item.height - vector.y >= 20) {
-					item.height = item.height - vector.y
-				}
-			} else if (Math.abs(item.rotate) == 90 || Math.abs(item.rotate) == 270) {
-				//缩小的移动不可越界
-				if (item.width - vector.y >= 20) {
-					item.width = item.width - vector.y
-					item.y = item.y + vector.y / 2
-					item.x = item.x + vector.y / 2
-				} else {
-					item.y = item.y + vector.y
-				}
-			}
-			item._resize()
-		})
-		//使辅助点也跟着移动
-		BIU_GLOBAL.checkedAUX.reLocate()
+		var menuConf = getItemMenuConf()
+		//当前元素自定义的缩放事件，或用户自定义的全局缩放事件，或默认缩放事件
+		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].topMiddleZoom || BIU_GLOBAL.option.auxItemZoom.topMiddleZoom || AUX_ITEM_ZOOM.topMiddleZoom
+		fun(ev)
 	}
 	
 	//单个元素的缩放事件，右上
 	function topRightZoom(ev){
-		//计算x与y的位移量
-		var offsetX = ev.offsetX - BIU_GLOBAL.mouse.x
-		var offsetY = ev.offsetY - BIU_GLOBAL.mouse.y
-		BIU_GLOBAL.mouse.x = ev.offsetX
-		BIU_GLOBAL.mouse.y = ev.offsetY
-		//计算元素实际需要移动的距离
-		var vector = getMoveXY(offsetX, offsetY)
-		//缩放当前元素,重新计算x,y,width,heigth
-		BIU_GLOBAL.checkedSVGItem.forEach(item => {
-			if (item.rotate == 0 || Math.abs(item.rotate) == 180) {
-				//缩小的移动不可越界
-				if (item.width + vector.x >= 20) {
-					item.width = item.width + vector.x
-				} else {
-					item.x = item.x + vector.x
-				}
-				if (item.height - vector.y >= 20) {
-					item.height = item.height - vector.y
-				}
-				item.y = item.y + vector.y
-			} else if (Math.abs(item.rotate) == 90 || Math.abs(item.rotate) == 270) {
-				//缩小的移动不可越界
-				if (item.width - vector.y >= 20) {
-					item.width = item.width - vector.y
-					item.x = item.x + (vector.x + vector.y) / 2
-				}
-				if (item.height + vector.x >= 20) {
-					item.height = item.height + vector.x
-					item.y = item.y - (vector.x - vector.y) / 2
-				}
-			}
-			item._resize()
-		})
-		//使辅助点也跟着移动
-		BIU_GLOBAL.checkedAUX.reLocate()
+		var menuConf = getItemMenuConf()
+		//当前元素自定义的缩放事件，或用户自定义的全局缩放事件，或默认缩放事件
+		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].topRightZoom || BIU_GLOBAL.option.auxItemZoom.topRightZoom || AUX_ITEM_ZOOM.topRightZoom
+		fun(ev)
 	}
 	
 	//左中点的缩放
 	function middleLeftZoom(ev) {
-		//计算x与y的位移量
-		var offsetX = ev.offsetX - BIU_GLOBAL.mouse.x
-		var offsetY = ev.offsetY - BIU_GLOBAL.mouse.y
-		BIU_GLOBAL.mouse.x = ev.offsetX
-		BIU_GLOBAL.mouse.y = ev.offsetY
-		//计算元素实际需要移动的距离
-		var vector = getMoveXY(offsetX, offsetY)
-		//缩放当前元素,重新计算x,y,width,heigth
-		BIU_GLOBAL.checkedSVGItem.forEach(item => {
-			if (item.rotate == 0 || Math.abs(item.rotate) == 180) {
-				//缩小的移动不可越界
-				item.x = item.x + vector.x
-				//缩小的移动不可越界
-				if (item.width - vector.x >= 20) {
-					item.width = item.width - vector.x
-				}
-			} else if (Math.abs(item.rotate) == 90 || Math.abs(item.rotate) == 270) {
-				//缩小的移动不可越界
-				if (item.height - vector.x >= 20) {
-					item.height = item.height - vector.x
-					item.y = item.y + (vector.x + vector.y) / 2
-					item.x = item.x + (vector.x + vector.y) / 2
-				} else {
-					item.x = item.x + (vector.x + vector.y)
-				}
-			}
-			item._resize()
-		})
-		//使辅助点也跟着移动
-		BIU_GLOBAL.checkedAUX.reLocate()
+		var menuConf = getItemMenuConf()
+		//当前元素自定义的缩放事件，或用户自定义的全局缩放事件，或默认缩放事件
+		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].middleLeftZoom || BIU_GLOBAL.option.auxItemZoom.middleLeftZoom || AUX_ITEM_ZOOM.middleLeftZoom
+		fun(ev)
 	}
 	
 	//右中点的缩放
 	function middleRightZoom(ev) {
-		//计算x与y的位移量
-		var offsetX = ev.offsetX - BIU_GLOBAL.mouse.x
-		var offsetY = ev.offsetY - BIU_GLOBAL.mouse.y
-		BIU_GLOBAL.mouse.x = ev.offsetX
-		BIU_GLOBAL.mouse.y = ev.offsetY
-		//计算元素实际需要移动的距离
-		var vector = getMoveXY(offsetX, offsetY)
-		//缩放当前元素,重新计算x,y,width,heigth
-		BIU_GLOBAL.checkedSVGItem.forEach(item => {
-			if (item.rotate == 0 || Math.abs(item.rotate) == 180) {
-				//缩小的移动不可越界
-				if (item.width + vector.x >= 20) {
-					item.width = item.width + vector.x
-				} else {
-					item.x = item.x + vector.x
-				}
-			} else if (Math.abs(item.rotate) == 90 || Math.abs(item.rotate) == 270) {
-				//缩小的移动不可越界
-				if (item.height + vector.x >= 20) {
-					item.height = item.height + vector.x
-					item.y = item.y - (vector.x - vector.y) / 2
-					item.x = item.x + (vector.x + vector.y) / 2
-				} else {
-					item.x = item.x + (vector.x + vector.y)
-				}
-			}
-			item._resize()
-		})
-		//使辅助点也跟着移动
-		BIU_GLOBAL.checkedAUX.reLocate()
+		var menuConf = getItemMenuConf()
+		//当前元素自定义的缩放事件，或用户自定义的全局缩放事件，或默认缩放事件
+		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].middleRightZoom || BIU_GLOBAL.option.auxItemZoom.middleRightZoom || AUX_ITEM_ZOOM.middleRightZoom
+		fun(ev)
 	}
 
 	//左下辅助点缩放事件
 	function bottomLeftZoom(ev) {
-		//计算x与y的位移量
-		var offsetX = ev.offsetX - BIU_GLOBAL.mouse.x
-		var offsetY = ev.offsetY - BIU_GLOBAL.mouse.y
-		BIU_GLOBAL.mouse.x = ev.offsetX
-		BIU_GLOBAL.mouse.y = ev.offsetY
-		//计算元素实际需要移动的距离
-		var vector = getMoveXY(offsetX, offsetY)
-		//缩放当前元素,重新计算x,y,width,heigth
-		BIU_GLOBAL.checkedSVGItem.forEach(item => {
-			if (item.rotate == 0 || Math.abs(item.rotate) == 180) {
-				item.x = item.x + vector.x
-				//缩小的移动不可越界
-				if (item.width - vector.x >= 20) {
-					item.width = item.width - vector.x
-				}
-				
-				if (item.height + vector.y >= 20) {
-					item.height = item.height + vector.y
-				} else {
-					item.y = item.y + vector.y
-				}
-			} else if (Math.abs(item.rotate) == 90 || Math.abs(item.rotate) == 270) {
-				//缩小的移动不可越界
-				if (item.width + vector.y >= 20) {
-					item.width = item.width + vector.y
-					item.x = item.x + (vector.x - vector.y)/2
-				}
-				if (item.height - vector.x >= 20) {
-					item.height = item.height - vector.x
-					item.y = item.y + (vector.x + vector.y)/2
-				}
-			}
-			item._resize()
-		})
-		//使辅助点也跟着移动
-		BIU_GLOBAL.checkedAUX.reLocate()
+		var menuConf = getItemMenuConf()
+		//当前元素自定义的缩放事件，或用户自定义的全局缩放事件，或默认缩放事件
+		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].bottomLeftZoom || BIU_GLOBAL.option.auxItemZoom.bottomLeftZoom || AUX_ITEM_ZOOM.bottomLeftZoom
+		fun(ev)
 	}
 	
 	//中下辅助点缩放事件
 	function bottomMiddleZoom(ev) {
-		//计算x与y的位移量
-		var offsetX = ev.offsetX - BIU_GLOBAL.mouse.x
-		var offsetY = ev.offsetY - BIU_GLOBAL.mouse.y
-		BIU_GLOBAL.mouse.x = ev.offsetX
-		BIU_GLOBAL.mouse.y = ev.offsetY
-		//计算元素实际需要移动的距离
-		var vector = getMoveXY(offsetX, offsetY)
-		//缩放当前元素,重新计算x,y,width,heigth
-		BIU_GLOBAL.checkedSVGItem.forEach(item => {
-			if (item.rotate == 0 || Math.abs(item.rotate) == 180) {
-				if (item.height + vector.y >= 20) {
-					item.height = item.height + vector.y
-				} else {
-					item.y = item.y + vector.y
-				}
-			} else if (Math.abs(item.rotate) == 90 || Math.abs(item.rotate) == 270) {
-				//缩小的移动不可越界
-				if (item.width + vector.y >= 20) {
-					item.width = item.width + vector.y
-					item.x = item.x + (vector.x - vector.y)/2
-					item.y = item.y + (vector.x + vector.y)/2
-				} else {
-					item.y = item.y + (vector.x + vector.y)
-				}
-			}
-			item._resize()
-		})
-		//使辅助点也跟着移动
-		BIU_GLOBAL.checkedAUX.reLocate()
+		var menuConf = getItemMenuConf()
+		//当前元素自定义的缩放事件，或用户自定义的全局缩放事件，或默认缩放事件
+		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].bottomMiddleZoom || BIU_GLOBAL.option.auxItemZoom.bottomMiddleZoom || AUX_ITEM_ZOOM.bottomMiddleZoom
+		fun(ev)
 	}
 	
 	//右下辅助点缩放事件
 	function bottomRightZoom(ev) {
-		//计算x与y的位移量
-		var offsetX = ev.offsetX - BIU_GLOBAL.mouse.x
-		var offsetY = ev.offsetY - BIU_GLOBAL.mouse.y
-		BIU_GLOBAL.mouse.x = ev.offsetX
-		BIU_GLOBAL.mouse.y = ev.offsetY
-		//计算元素实际需要移动的距离
-		var vector = getMoveXY(offsetX, offsetY)
-		//缩放当前元素,重新计算x,y,width,heigth
-		BIU_GLOBAL.checkedSVGItem.forEach(item => {
-			if (item.rotate == 0 || Math.abs(item.rotate) == 180) {
-				//缩小的移动不可越界
-				if (item.width + vector.x >= 20) {
-					item.width = item.width + vector.x
-				} else {
-					item.x = item.x + vector.x
-				}
-				if (item.height + vector.y >= 20) {
-					item.height = item.height + vector.y
-				} else {
-					item.y = item.y + vector.y
-				}
-			} else if (Math.abs(item.rotate) == 90 || Math.abs(item.rotate) == 270) {
-				//缩小的移动不可越界
-				if (item.width + vector.y >= 20) {
-					item.width = item.width + vector.y
-					item.x = item.x + (vector.x - vector.y)/2
-				}
-				if (item.height + vector.x >= 20) {
-					item.height = item.height + vector.x
-					item.y = item.y - (vector.x - vector.y)/2
-				}
-			}
-			item._resize()
-		})
-		//使辅助点也跟着移动
-		BIU_GLOBAL.checkedAUX.reLocate()
+		var menuConf = getItemMenuConf()
+		//当前元素自定义的缩放事件，或用户自定义的全局缩放事件，或默认缩放事件
+		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].bottomRightZoom || BIU_GLOBAL.option.auxItemZoom.bottomRightZoom || AUX_ITEM_ZOOM.bottomRightZoom
+		fun(ev)
 	}
 	
 	//计算实际位移向量
@@ -964,30 +1017,6 @@
 		return {
 			x: offsetX * (svgSize.width * ratio) / BIU_GLOBAL.svg.clientWidth,
 			y: offsetY * (svgSize.height * ratio) / BIU_GLOBAL.svg.clientHeight
-		}
-	}
-	
-	//根据当前元素的rotate进行向量变换
-	function vectorRotate(v) {
-		//唯一元素的旋转度数
-		var rotate = BIU_GLOBAL.checkedSVGItem[0].rotate
-		if (rotate == 0) {
-			return v
-		} else if (rotate == 90 || rotate == -270) {
-			return {
-				x: v.y,
-				y: -v.x
-			}
-		} else if (rotate == 180 || rotate == -180) {
-			return {
-				x: -v.x,
-				y: -v.y
-			}
-		} else if (rotate == 270 || rotate == -90) {
-			return {
-				x: -v.y,
-				y: v.x
-			}
 		}
 	}
 	
