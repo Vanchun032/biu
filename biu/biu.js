@@ -196,13 +196,13 @@
 		{
 			name: '保存',
 			feature: function() {
-				console.log('保存数据')
+				biuMsg('保存数据')
 			}
 		},
 		{
 			name: '重置',
 			feature: function() {
-				console.log('重置数据')
+				biuMsg('重置数据')
 			}
 		}
 	]
@@ -1094,7 +1094,8 @@
 		var svgItemSize = itemMenuConf[item_name].size || SVG_ITEM_SIZE
 		this.width = svgItemSize.width
 		this.height = svgItemSize.height
-		this.data = data || {}
+		//用户传入，或默认，或空
+		this.data = data || itemMenuConf[item_name].data || {}
 		this.rotate = 0
 		this._dom = this._initDom()
 		this._initEvent()
