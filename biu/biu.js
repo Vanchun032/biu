@@ -514,6 +514,75 @@
 		}
 	}
 
+	var BUILTIN_OBJECT = {
+	    '[object Function]': 1,
+	    '[object RegExp]': 1,
+	    '[object Date]': 1,
+	    '[object Error]': 1,
+	    '[object CanvasGradient]': 1,
+	    '[object CanvasPattern]': 1,
+	    // For node-canvas
+	    '[object Image]': 1,
+	    '[object Canvas]': 1
+	}
+	
+	var TYPED_ARRAY = {
+	    '[object Int8Array]': 1,
+	    '[object Uint8Array]': 1,
+	    '[object Uint8ClampedArray]': 1,
+	    '[object Int16Array]': 1,
+	    '[object Uint16Array]': 1,
+	    '[object Int32Array]': 1,
+	    '[object Uint32Array]': 1,
+	    '[object Float32Array]': 1,
+	    '[object Float64Array]': 1
+	}
+
+	var objToString = Object.prototype.toString;
+	
+	function isDom(value) {
+	    return typeof value === 'object'
+	        && typeof value.nodeType === 'number'
+	        && typeof value.ownerDocument === 'object';
+	}
+
+	//深度克隆
+	function clone(source) {
+	    if (source == null || typeof source !== 'object') {
+	        return source;
+	    }
+	
+	    var result = source;
+	    var typeStr = objToString.call(source);
+	
+	    if (typeStr === '[object Array]') {
+	        result = [];
+	        for (var i = 0, len = source.length; i < len; i++) {
+	            result[i] = clone(source[i]);
+	        }
+	    } else if (TYPED_ARRAY[typeStr]) {
+	        var Ctor = source.constructor;
+	        if (source.constructor.from) {
+	            result = Ctor.from(source);
+	        }
+	        else {
+	            result = new Ctor(source.length);
+	            for (var i = 0, len = source.length; i < len; i++) {
+	                result[i] = clone(source[i]);
+	            }
+	        }
+	    }
+	    else if (!BUILTIN_OBJECT[typeStr] && !isDom(source)) {
+	        result = {};
+	        for (var key in source) {
+	            if (source.hasOwnProperty(key)) {
+	                result[key] = clone(source[key]);
+	            }
+	        }
+	    }
+	    return result;
+	}
+
 	//处理用户style的个性配置
 	function setStyle(target, opt, def) {
 		opt = opt || {}
@@ -948,64 +1017,72 @@
 	//单个元素的缩放事件，左上
 	function topLeftZoom(ev) {
 		var menuConf = getItemMenuConf()
+		var auxItemZoomOption = BIU_GLOBAL.option.auxItemZoom || {}
 		//当前元素自定义的缩放事件，或用户自定义的全局缩放事件，或默认缩放事件
-		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].topLeftZoom || BIU_GLOBAL.option.auxItemZoom.topLeftZoom || AUX_ITEM_ZOOM.topLeftZoom
+		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].topLeftZoom || auxItemZoomOption.topLeftZoom || AUX_ITEM_ZOOM.topLeftZoom
 		fun(ev)
 	}
 	
 	//单个元素的缩放事件，中上
 	function topMiddleZoom(ev) {
 		var menuConf = getItemMenuConf()
+		var auxItemZoomOption = BIU_GLOBAL.option.auxItemZoom || {}
 		//当前元素自定义的缩放事件，或用户自定义的全局缩放事件，或默认缩放事件
-		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].topMiddleZoom || BIU_GLOBAL.option.auxItemZoom.topMiddleZoom || AUX_ITEM_ZOOM.topMiddleZoom
+		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].topMiddleZoom || auxItemZoomOption.topMiddleZoom || AUX_ITEM_ZOOM.topMiddleZoom
 		fun(ev)
 	}
 	
 	//单个元素的缩放事件，右上
 	function topRightZoom(ev){
 		var menuConf = getItemMenuConf()
+		var auxItemZoomOption = BIU_GLOBAL.option.auxItemZoom || {}
 		//当前元素自定义的缩放事件，或用户自定义的全局缩放事件，或默认缩放事件
-		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].topRightZoom || BIU_GLOBAL.option.auxItemZoom.topRightZoom || AUX_ITEM_ZOOM.topRightZoom
+		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].topRightZoom || auxItemZoomOption.topRightZoom || AUX_ITEM_ZOOM.topRightZoom
 		fun(ev)
 	}
 	
 	//左中点的缩放
 	function middleLeftZoom(ev) {
 		var menuConf = getItemMenuConf()
+		var auxItemZoomOption = BIU_GLOBAL.option.auxItemZoom || {}
 		//当前元素自定义的缩放事件，或用户自定义的全局缩放事件，或默认缩放事件
-		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].middleLeftZoom || BIU_GLOBAL.option.auxItemZoom.middleLeftZoom || AUX_ITEM_ZOOM.middleLeftZoom
+		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].middleLeftZoom || auxItemZoomOption.middleLeftZoom || AUX_ITEM_ZOOM.middleLeftZoom
 		fun(ev)
 	}
 	
 	//右中点的缩放
 	function middleRightZoom(ev) {
 		var menuConf = getItemMenuConf()
+		var auxItemZoomOption = BIU_GLOBAL.option.auxItemZoom || {}
 		//当前元素自定义的缩放事件，或用户自定义的全局缩放事件，或默认缩放事件
-		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].middleRightZoom || BIU_GLOBAL.option.auxItemZoom.middleRightZoom || AUX_ITEM_ZOOM.middleRightZoom
+		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].middleRightZoom || auxItemZoomOption.middleRightZoom || AUX_ITEM_ZOOM.middleRightZoom
 		fun(ev)
 	}
 
 	//左下辅助点缩放事件
 	function bottomLeftZoom(ev) {
 		var menuConf = getItemMenuConf()
+		var auxItemZoomOption = BIU_GLOBAL.option.auxItemZoom || {}
 		//当前元素自定义的缩放事件，或用户自定义的全局缩放事件，或默认缩放事件
-		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].bottomLeftZoom || BIU_GLOBAL.option.auxItemZoom.bottomLeftZoom || AUX_ITEM_ZOOM.bottomLeftZoom
+		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].bottomLeftZoom || auxItemZoomOption.bottomLeftZoom || AUX_ITEM_ZOOM.bottomLeftZoom
 		fun(ev)
 	}
 	
 	//中下辅助点缩放事件
 	function bottomMiddleZoom(ev) {
 		var menuConf = getItemMenuConf()
+		var auxItemZoomOption = BIU_GLOBAL.option.auxItemZoom || {}
 		//当前元素自定义的缩放事件，或用户自定义的全局缩放事件，或默认缩放事件
-		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].bottomMiddleZoom || BIU_GLOBAL.option.auxItemZoom.bottomMiddleZoom || AUX_ITEM_ZOOM.bottomMiddleZoom
+		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].bottomMiddleZoom || auxItemZoomOption.bottomMiddleZoom || AUX_ITEM_ZOOM.bottomMiddleZoom
 		fun(ev)
 	}
 	
 	//右下辅助点缩放事件
 	function bottomRightZoom(ev) {
 		var menuConf = getItemMenuConf()
+		var auxItemZoomOption = BIU_GLOBAL.option.auxItemZoom || {}
 		//当前元素自定义的缩放事件，或用户自定义的全局缩放事件，或默认缩放事件
-		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].bottomRightZoom || BIU_GLOBAL.option.auxItemZoom.bottomRightZoom || AUX_ITEM_ZOOM.bottomRightZoom
+		var fun = menuConf[BIU_GLOBAL.checkedSVGItem[0].item_name].bottomRightZoom || auxItemZoomOption.bottomRightZoom || AUX_ITEM_ZOOM.bottomRightZoom
 		fun(ev)
 	}
 	
@@ -1095,7 +1172,7 @@
 		this.width = svgItemSize.width
 		this.height = svgItemSize.height
 		//用户传入，或默认，或空
-		this.data = data || itemMenuConf[item_name].data || {}
+		this.data = clone(data || itemMenuConf[item_name].data || {})
 		this.rotate = 0
 		this._dom = this._initDom()
 		this._initEvent()
