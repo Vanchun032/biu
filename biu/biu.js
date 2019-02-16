@@ -5,130 +5,133 @@
 }(this, (function(exports) {
 	'use strict'
 
+
 	//默认样式
-	const PAGE_STYLE = {
-		margin: 0,
-		padding: 0
-	}
-	const BIU_STYLE = {
-		width: '100vw',
-		height: '100vh',
-		display: 'flex'
-	}
-	const MENU_STYLE = {
-		width: '10%',
-		height: '100%',
-		backgroundColor: '#f7f7f7',
-		display: 'flex',
-		flexWrap: 'wrap',
-		justifyContent: 'flex-start',
-		alignItems: 'flex-start',
-		padding: 0
-	}
-	const ITEM_BTN_STYLE = {
-		width: '50%',
-		height: '5%',
-		backgroundColor: '#f7f7f7',
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'center',
-		cursor: 'pointer'
-	}
-	const FEATURE_BTN_STYLE = {
-		width: '50%',
-		height: '5%',
-		backgroundColor: '#d6d6d6',
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'center',
-		cursor: 'pointer'
-	}
-	const ITEM_MENU_STYLE = {
-		width: '100%',
-		height: '95%',
-		backgroundColor: '#f7f7f7',
-		display: 'flex',
-		flexWrap: 'wrap',
-		justifyContent: 'space-around',
-		alignItems: 'flex-start',
-		boxSizing: 'border-box',
-		padding: '20px 20px'
-	}
-	const FEATURE_MENU_STYLE = {
-		width: '100%',
-		height: '95%',
-		backgroundColor: '#d6d6d6',
-		display: 'flex',
-		flexDirection: 'column',
-		justifyContent: 'flex-start',
-		alignItems: 'flex-start',
-		boxSizing: 'border-box',
-		padding: '0'
-	}
-	const BODY_STYLE = {
-		width: '90%',
-		height: '100%',
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'center',
-		backgroundColor: '#333'
-	}
-	const SVG_STYLE = {
-		backgroundColor: '#333'
-	}
-	const CANVAS_COLOR = '#fff'
-	const MENU_ITEM_STYLE = {
-		width: '90px',
-		height: '100px',
-		display: 'flex',
-		flexDirection: 'column'
-	}
-	const MENU_ITEM_ICON_STYLE = {
-		height: '60px'
-	}
-	const MENU_ITEM_TITLE_STYLE = {
-		textAlign: 'center',
-		userSelect: 'none'
-	}
-	const FEATURE_MENU_ITEM_STYLE = {
-		width: '100%',
-		height: '40px',
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'center',
-		cursor: 'pointer'
-	}
-	const CONTEXT_MENU_STYLE = {
-		backgroundColor: '#f7f7f7',
-		listStyle: 'none',
-		textAlign: 'center',
-		padding: 0,
-		margin: 0
-	}
-	const CONTEXT_MENU_ITEM_STYLE = {
-		padding: '2px 20px',
-		cursor: 'default'
-	}
-	const SVG_SIZE = {
-		width: 1920,
-		height: 1080
-	}
-	const SVG_ITEM_SIZE = {
-		width: 100,
-		height: 100
-	}
-	const AUX_ITEM_SIZE = {
-		width: 10,
-		height: 10
-	}
-	const MSG_STYLE = {
-		position: 'fixed',
-		left: '80%',
-		top: '20%',
-		transform: 'translate(-50%, -50%)',
-		padding: '20px 40px',
-		backgroundColor: '#f7f7f7',
-		color: '#333333'
+	const STYLE = {
+		PAGE_STYLE: {
+			margin: 0,
+			padding: 0
+		},
+		BIU_STYLE: {
+			width: '100vw',
+			height: '100vh',
+			display: 'flex'
+		},
+		MENU_STYLE: {
+			width: '10%',
+			height: '100%',
+			backgroundColor: '#f7f7f7',
+			display: 'flex',
+			flexWrap: 'wrap',
+			justifyContent: 'flex-start',
+			alignItems: 'flex-start',
+			padding: 0
+		},
+		ITEM_BTN_STYLE: {
+			width: '50%',
+			height: '5%',
+			backgroundColor: '#f7f7f7',
+			display: 'flex',
+			justifyContent: 'center',
+			alignItems: 'center',
+			cursor: 'pointer'
+		},
+		FEATURE_BTN_STYLE: {
+			width: '50%',
+			height: '5%',
+			backgroundColor: '#d6d6d6',
+			display: 'flex',
+			justifyContent: 'center',
+			alignItems: 'center',
+			cursor: 'pointer'
+		},
+		ITEM_MENU_STYLE: {
+			width: '100%',
+			height: '95%',
+			backgroundColor: '#f7f7f7',
+			display: 'flex',
+			flexWrap: 'wrap',
+			justifyContent: 'space-around',
+			alignItems: 'flex-start',
+			boxSizing: 'border-box',
+			padding: '20px 20px'
+		},
+		FEATURE_MENU_STYLE: {
+			width: '100%',
+			height: '95%',
+			backgroundColor: '#d6d6d6',
+			display: 'flex',
+			flexDirection: 'column',
+			justifyContent: 'flex-start',
+			alignItems: 'flex-start',
+			boxSizing: 'border-box',
+			padding: '0'
+		},
+		BODY_STYLE: {
+			width: '90%',
+			height: '100%',
+			display: 'flex',
+			justifyContent: 'center',
+			alignItems: 'center',
+			backgroundColor: '#333'
+		},
+		SVG_STYLE: {
+			backgroundColor: '#333'
+		},
+		CANVAS_COLOR: '#fff',
+		MENU_ITEM_STYLE: {
+			width: '90px',
+			height: '100px',
+			display: 'flex',
+			flexDirection: 'column'
+		},
+		MENU_ITEM_ICON_STYLE: {
+			height: '60px'
+		},
+		MENU_ITEM_TITLE_STYLE: {
+			textAlign: 'center',
+			userSelect: 'none'
+		},
+		FEATURE_MENU_ITEM_STYLE: {
+			width: '100%',
+			height: '40px',
+			display: 'flex',
+			justifyContent: 'center',
+			alignItems: 'center',
+			cursor: 'pointer'
+		},
+		CONTEXT_MENU_STYLE: {
+			backgroundColor: '#f7f7f7',
+			listStyle: 'none',
+			textAlign: 'center',
+			padding: 0,
+			margin: 0
+		},
+		CONTEXT_MENU_ITEM_STYLE: {
+			padding: '2px 20px',
+			cursor: 'default'
+		},
+		SVG_SIZE: {
+			width: 1920,
+			height: 1080
+		},
+		SVG_ITEM_SIZE: {
+			width: 100,
+			height: 100
+		},
+		AUX_ITEM_SIZE: {
+			width: 10,
+			height: 10
+		},
+		MSG_STYLE: {
+			position: 'fixed',
+			left: '80%',
+			top: '20%',
+			transform: 'translate(-50%, -50%)',
+			padding: '20px 40px',
+			backgroundColor: '#f7f7f7',
+			color: '#333333'
+		}
 	}
 
 	//默认元素菜单配置
@@ -592,6 +595,11 @@
 		})
 	}
 
+	//获得用户的style配置
+	function getStyle() {
+		return BIU_GLOBAL.option.style || {}
+	}
+
 	//各类全局对象
 	var BIU_GLOBAL = {
 		option : null,
@@ -778,28 +786,28 @@
 	biuProto._initLayout = function() {
 		var self = this
 		//创建菜单对象
-		setStyle(document.getElementsByTagName('body')[0], BIU_GLOBAL.option.pageStyle, PAGE_STYLE)
-		setStyle(this._dom, BIU_GLOBAL.option.biuStyle, BIU_STYLE)
+		setStyle(document.getElementsByTagName('body')[0], getStyle().pageStyle, STYLE.PAGE_STYLE)
+		setStyle(this._dom, getStyle().biuStyle, STYLE.BIU_STYLE)
 		//创建menu和body，作为容器
 		this._menu = document.createElement("div")
 		this._body = document.createElement("div")
 		this._dom.appendChild(this._menu)
 		this._dom.appendChild(this._body)
-		setStyle(this._menu, BIU_GLOBAL.option.menuStyle, MENU_STYLE)
-		setStyle(this._body, BIU_GLOBAL.option.bodyStyle, BODY_STYLE)
+		setStyle(this._menu, getStyle().menuStyle, STYLE.MENU_STYLE)
+		setStyle(this._body, getStyle().bodyStyle, STYLE.BODY_STYLE)
 		//创建元素菜单和功能菜单的按钮
 		this._itemMenuBtn = document.createElement('div')
 		this._featureMenuBtn = document.createElement('div')
-		setStyle(this._itemMenuBtn, BIU_GLOBAL.option.menuBtnStyle, ITEM_BTN_STYLE)
-		setStyle(this._featureMenuBtn, BIU_GLOBAL.option.menuBtnStyle, FEATURE_BTN_STYLE)
+		setStyle(this._itemMenuBtn, getStyle().menuBtnStyle, STYLE.ITEM_BTN_STYLE)
+		setStyle(this._featureMenuBtn, getStyle().menuBtnStyle, STYLE.FEATURE_BTN_STYLE)
 		this._itemMenuBtn.innerHTML = '元素'
 		this._featureMenuBtn.innerHTML = '功能'
 		this._menu.appendChild(this._itemMenuBtn)
 		this._menu.appendChild(this._featureMenuBtn)
 		this._itemMenu = document.createElement('div')
 		this._featureMenu = document.createElement('div')
-		setStyle(this._itemMenu, BIU_GLOBAL.option.subMenuStyle, ITEM_MENU_STYLE)
-		setStyle(this._featureMenu, BIU_GLOBAL.option.subMenuStyle, FEATURE_MENU_STYLE)
+		setStyle(this._itemMenu, getStyle().subMenuStyle, STYLE.ITEM_MENU_STYLE)
+		setStyle(this._featureMenu, getStyle().subMenuStyle, STYLE.FEATURE_MENU_STYLE)
 		self._featureMenu.style.display = 'none'
 		this._menu.appendChild(this._itemMenu)
 		this._menu.appendChild(this._featureMenu)
@@ -815,13 +823,13 @@
 		this._svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
 		this._body.appendChild(this._svg)
 		//SVG元素的样式与viewBox
-		var svgSize = BIU_GLOBAL.option.svgSize || SVG_SIZE
+		var svgSize = getStyle().svgSize || STYLE.SVG_SIZE
 		this._svg.viewBox.baseVal.x = 0
 		this._svg.viewBox.baseVal.y = 0
 		this._svg.viewBox.baseVal.width = svgSize.width
 		this._svg.viewBox.baseVal.height = svgSize.height
 		//根据页面宽高比，设置SVGcss，务必保证不出现滚动条
-		setStyle(this._svg, BIU_GLOBAL.option.svgStyle, SVG_STYLE)
+		setStyle(this._svg, getStyle().svgStyle, STYLE.SVG_STYLE)
 		//如果屏幕比我更宽
 		if (document.body.clientWidth / document.body.clientHeight > svgSize.width / svgSize.height) {
 			this._svg.style.height = '100%'
@@ -834,7 +842,7 @@
 		rect.setAttribute('y', 0)
 		rect.setAttribute('width', svgSize.width)
 		rect.setAttribute('height', svgSize.height)
-		rect.setAttribute('fill', BIU_GLOBAL.option.canvasColor || CANVAS_COLOR)
+		rect.setAttribute('fill', getStyle().canvasColor || STYLE.CANVAS_COLOR)
 		this._svg.appendChild(rect)
 		//SVG对象应作为辅助点对象的父元素
 		BIU_GLOBAL.svg = this._svg
@@ -863,7 +871,7 @@
 		feaureMenuConf.forEach(feature => {
 			//创建dom元素，加入页面
 			var featureMenuItem = document.createElement('div')
-			setStyle(featureMenuItem, BIU_GLOBAL.option.fuatureMenuItem, FEATURE_MENU_ITEM_STYLE)
+			setStyle(featureMenuItem, BIU_GLOBAL.option.fuatureMenuItem, STYLE.FEATURE_MENU_ITEM_STYLE)
 			featureMenuItem.innerHTML = feature.name
 			featureMenuItem.addEventListener('click', feature.feature)
 			self._featureMenu.appendChild(featureMenuItem)
@@ -888,9 +896,9 @@
 			var item_name = ev.dataTransfer.getData("text")
 			//计算元素左上顶点的值
 			var ratio = BIU_GLOBAL.zoomQueue.arr[BIU_GLOBAL.zoomQueue.nowZoom].value
-			var svgSize = BIU_GLOBAL.option.svgSize || SVG_SIZE
-			var x = svgSize.width * ratio * ev.offsetX / BIU_GLOBAL.svg.clientWidth
-			var y = svgSize.height * ratio * ev.offsetY / BIU_GLOBAL.svg.clientHeight
+			var svgSize = BIU_GLOBAL.option.svgSize || STYLE.SVG_SIZE
+			var x = svgSize.width * ratio * ev.offsetX / BIU_GLOBAL.svg.clientWidth + BIU_GLOBAL.svg.viewBox.baseVal.x
+			var y = svgSize.height * ratio * ev.offsetY / BIU_GLOBAL.svg.clientHeight + BIU_GLOBAL.svg.viewBox.baseVal.y
 			new SVGItem(item_name, x, y)
 		})
 		this._svg.addEventListener('mousedown', function() {
@@ -976,7 +984,7 @@
 	//全局缩放事件，重计算viewBox
 	function zoomSVG() {
 		var ratio = BIU_GLOBAL.zoomQueue.arr[BIU_GLOBAL.zoomQueue.nowZoom].value
-		var svgSize = BIU_GLOBAL.option.svgSize || SVG_SIZE
+		var svgSize = getStyle().svgSize || STYLE.SVG_SIZE
 		BIU_GLOBAL.svg.viewBox.baseVal.width = svgSize.width * ratio
 		BIU_GLOBAL.svg.viewBox.baseVal.height = svgSize.height * ratio
 		biuMsg('当前缩放比例:' + BIU_GLOBAL.zoomQueue.arr[BIU_GLOBAL.zoomQueue.nowZoom].name)
@@ -985,7 +993,7 @@
 	function biuMsg(msg) {
 		var div = document.createElement('div')
 		div.innerHTML = msg
-		setStyle(div, BIU_GLOBAL.option.msgStyle, MSG_STYLE)
+		setStyle(div, getStyle().msgStyle, STYLE.MSG_STYLE)
 		document.getElementsByTagName('body')[0].appendChild(div)
 		setTimeout(function() {
 			div.parentNode.removeChild(div)
@@ -1090,7 +1098,7 @@
 	function getMoveXY(offsetX, offsetY) {
 		//计算元素实际需要移动的距离
 		var ratio = BIU_GLOBAL.zoomQueue.arr[BIU_GLOBAL.zoomQueue.nowZoom].value
-		var svgSize = BIU_GLOBAL.option.svgSize || SVG_SIZE
+		var svgSize = getStyle().svgSize || STYLE.SVG_SIZE
 		return {
 			x: offsetX * (svgSize.width * ratio) / BIU_GLOBAL.svg.clientWidth,
 			y: offsetY * (svgSize.height * ratio) / BIU_GLOBAL.svg.clientHeight
@@ -1102,7 +1110,7 @@
 		var ul = document.createElement('ul')
 		ul.style.display = 'none'
 		ul.style.position = 'absolute'
-		setStyle(ul, BIU_GLOBAL.option.contextMenuStyle, CONTEXT_MENU_STYLE)
+		setStyle(ul, getStyle().contextMenuStyle, STYLE.CONTEXT_MENU_STYLE)
 		document.getElementsByTagName('body')[0].appendChild(ul)
 		BIU_GLOBAL.contextMenu.dom = ul
 	}
@@ -1139,17 +1147,17 @@
 
 	menuItemProto._initDom = function(key) {
 		//配置DOM元素样式
-		setStyle(this._dom, BIU_GLOBAL.option.menuItemStyle, MENU_ITEM_STYLE)
+		setStyle(this._dom, getStyle().menuItemStyle, STYLE.MENU_ITEM_STYLE)
 		this._dom.style.backgroundColor = this._item.color
 		this._dom.setAttribute('draggable', 'true')
 		this._parent.appendChild(this._dom)
 		var icon = document.createElement('img')
 		icon.setAttribute('src', this._item.url)
 		icon.setAttribute('draggable', 'false')
-		setStyle(icon, BIU_GLOBAL.option.menuItemIconStyle, MENU_ITEM_ICON_STYLE)
+		setStyle(icon, getStyle().menuItemIconStyle, STYLE.MENU_ITEM_ICON_STYLE)
 		var title = document.createElement('div')
 		title.innerText = this._item.title
-		setStyle(title, BIU_GLOBAL.option.menuItemTitleStyle, MENU_ITEM_TITLE_STYLE)
+		setStyle(title, getStyle().menuItemTitleStyle, STYLE.MENU_ITEM_TITLE_STYLE)
 		this._dom.appendChild(icon)
 		this._dom.appendChild(title)
 	}
@@ -1168,7 +1176,7 @@
 		this.y = y
 		this.checked = false
 		var itemMenuConf = getItemMenuConf()
-		var svgItemSize = itemMenuConf[item_name].size || SVG_ITEM_SIZE
+		var svgItemSize = itemMenuConf[item_name].size || STYLE.SVG_ITEM_SIZE
 		this.width = svgItemSize.width
 		this.height = svgItemSize.height
 		//用户传入，或默认，或空
@@ -1224,7 +1232,7 @@
 				menuItem.menus.forEach(menuEntry => {
 					var li = document.createElement('li')
 					li.innerHTML = menuEntry.name
-					setStyle(li, BIU_GLOBAL.option.contextMenuItemStyle, CONTEXT_MENU_ITEM_STYLE)
+					setStyle(li, BIU_GLOBAL.option.contextMenuItemStyle, STYLE.CONTEXT_MENU_ITEM_STYLE)
 					li.addEventListener('click', function() {
 						menuEntry.callBack(self)
 						//执行后隐藏右键菜单
@@ -1312,7 +1320,7 @@
 			BIU_GLOBAL.svg.removeChild(this._dom)
 		},
 		this._getSize = function() {
-			var auxItemSize = BIU_GLOBAL.option.auxItemSize || AUX_ITEM_SIZE
+			var auxItemSize = BIU_GLOBAL.option.auxItemSize || STYLE.AUX_ITEM_SIZE
 			//不管缩放，永远保持展示大小的一致
 			this.width = auxItemSize.width * BIU_GLOBAL.zoomQueue.arr[BIU_GLOBAL.zoomQueue.nowZoom].value
 			this.height = auxItemSize.height * BIU_GLOBAL.zoomQueue.arr[BIU_GLOBAL.zoomQueue.nowZoom].value
