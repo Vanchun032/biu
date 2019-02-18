@@ -786,28 +786,28 @@
 	biuProto._initLayout = function() {
 		var self = this
 		//创建菜单对象
-		setStyle(document.getElementsByTagName('body')[0], getStyle().pageStyle, STYLE.PAGE_STYLE)
-		setStyle(this._dom, getStyle().biuStyle, STYLE.BIU_STYLE)
+		setStyle(document.getElementsByTagName('body')[0], getStyle().page, STYLE.PAGE_STYLE)
+		setStyle(this._dom, getStyle().biu, STYLE.BIU_STYLE)
 		//创建menu和body，作为容器
 		this._menu = document.createElement("div")
 		this._body = document.createElement("div")
 		this._dom.appendChild(this._menu)
 		this._dom.appendChild(this._body)
-		setStyle(this._menu, getStyle().menuStyle, STYLE.MENU_STYLE)
-		setStyle(this._body, getStyle().bodyStyle, STYLE.BODY_STYLE)
+		setStyle(this._menu, getStyle().menu, STYLE.MENU_STYLE)
+		setStyle(this._body, getStyle().body, STYLE.BODY_STYLE)
 		//创建元素菜单和功能菜单的按钮
 		this._itemMenuBtn = document.createElement('div')
 		this._featureMenuBtn = document.createElement('div')
-		setStyle(this._itemMenuBtn, getStyle().menuBtnStyle, STYLE.ITEM_BTN_STYLE)
-		setStyle(this._featureMenuBtn, getStyle().menuBtnStyle, STYLE.FEATURE_BTN_STYLE)
+		setStyle(this._itemMenuBtn, getStyle().menuBtn, STYLE.ITEM_BTN_STYLE)
+		setStyle(this._featureMenuBtn, getStyle().menuBtn, STYLE.FEATURE_BTN_STYLE)
 		this._itemMenuBtn.innerHTML = '元素'
 		this._featureMenuBtn.innerHTML = '功能'
 		this._menu.appendChild(this._itemMenuBtn)
 		this._menu.appendChild(this._featureMenuBtn)
 		this._itemMenu = document.createElement('div')
 		this._featureMenu = document.createElement('div')
-		setStyle(this._itemMenu, getStyle().subMenuStyle, STYLE.ITEM_MENU_STYLE)
-		setStyle(this._featureMenu, getStyle().subMenuStyle, STYLE.FEATURE_MENU_STYLE)
+		setStyle(this._itemMenu, getStyle().subMenu, STYLE.ITEM_MENU_STYLE)
+		setStyle(this._featureMenu, getStyle().subMenu, STYLE.FEATURE_MENU_STYLE)
 		self._featureMenu.style.display = 'none'
 		this._menu.appendChild(this._itemMenu)
 		this._menu.appendChild(this._featureMenu)
@@ -829,7 +829,7 @@
 		this._svg.viewBox.baseVal.width = svgSize.width
 		this._svg.viewBox.baseVal.height = svgSize.height
 		//根据页面宽高比，设置SVGcss，务必保证不出现滚动条
-		setStyle(this._svg, getStyle().svgStyle, STYLE.SVG_STYLE)
+		setStyle(this._svg, getStyle().svg, STYLE.SVG_STYLE)
 		//如果屏幕比我更宽
 		if (document.body.clientWidth / document.body.clientHeight > svgSize.width / svgSize.height) {
 			this._svg.style.height = '100%'
@@ -993,7 +993,7 @@
 	function biuMsg(msg) {
 		var div = document.createElement('div')
 		div.innerHTML = msg
-		setStyle(div, getStyle().msgStyle, STYLE.MSG_STYLE)
+		setStyle(div, getStyle().msg, STYLE.MSG_STYLE)
 		document.getElementsByTagName('body')[0].appendChild(div)
 		setTimeout(function() {
 			div.parentNode.removeChild(div)
@@ -1110,7 +1110,7 @@
 		var ul = document.createElement('ul')
 		ul.style.display = 'none'
 		ul.style.position = 'absolute'
-		setStyle(ul, getStyle().contextMenuStyle, STYLE.CONTEXT_MENU_STYLE)
+		setStyle(ul, getStyle().contextMenu, STYLE.CONTEXT_MENU_STYLE)
 		document.getElementsByTagName('body')[0].appendChild(ul)
 		BIU_GLOBAL.contextMenu.dom = ul
 	}
@@ -1147,17 +1147,17 @@
 
 	menuItemProto._initDom = function(key) {
 		//配置DOM元素样式
-		setStyle(this._dom, getStyle().menuItemStyle, STYLE.MENU_ITEM_STYLE)
+		setStyle(this._dom, getStyle().menuItem, STYLE.MENU_ITEM_STYLE)
 		this._dom.style.backgroundColor = this._item.color
 		this._dom.setAttribute('draggable', 'true')
 		this._parent.appendChild(this._dom)
 		var icon = document.createElement('img')
 		icon.setAttribute('src', this._item.url)
 		icon.setAttribute('draggable', 'false')
-		setStyle(icon, getStyle().menuItemIconStyle, STYLE.MENU_ITEM_ICON_STYLE)
+		setStyle(icon, getStyle().menuItemIcon, STYLE.MENU_ITEM_ICON_STYLE)
 		var title = document.createElement('div')
 		title.innerText = this._item.title
-		setStyle(title, getStyle().menuItemTitleStyle, STYLE.MENU_ITEM_TITLE_STYLE)
+		setStyle(title, getStyle().menuItemTitle, STYLE.MENU_ITEM_TITLE_STYLE)
 		this._dom.appendChild(icon)
 		this._dom.appendChild(title)
 	}
