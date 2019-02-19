@@ -605,6 +605,7 @@
 
 	//各类全局对象
 	var BIU_GLOBAL = {
+		svg: null,
 		option : null,
 		SVGItems: [],
 		checkedSVGItem: [], //已选中的对象数组
@@ -1541,4 +1542,7 @@
 	exports.createItem = createItem
 	exports.items = BIU_GLOBAL.SVGItems
 	exports.auxs = BIU_GLOBAL.checkedAUX
+	exports.svg = function() {
+		return BIU_GLOBAL.svg
+	}
 })));
