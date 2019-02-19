@@ -212,6 +212,9 @@
 	
 	//默认生命周期
 	const SVG_ITEM_LIFE = {
+		before: function(item_name, x, y) {
+			new SVGItem(item_name, x, y)
+		},
 		init: function(self, itemMenu, svg) {
 			var g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
 			var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
@@ -899,7 +902,10 @@
 			var svgSize = BIU_GLOBAL.option.svgSize || STYLE.SVG_SIZE
 			var x = svgSize.width * ratio * ev.offsetX / BIU_GLOBAL.svg.clientWidth + BIU_GLOBAL.svg.viewBox.baseVal.x
 			var y = svgSize.height * ratio * ev.offsetY / BIU_GLOBAL.svg.clientHeight + BIU_GLOBAL.svg.viewBox.baseVal.y
-			new SVGItem(item_name, x, y)
+			//对象创建的生命周期
+			var itemMenuConf = getItemMenuConf()
+			var before = itemMenuConf[item_name].before || SVG_ITEM_LIFE.before
+			before(item_name, x, y)
 		})
 		this._svg.addEventListener('mousedown', function() {
 			//点击背景，取消元素的选中
