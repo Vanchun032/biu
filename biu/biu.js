@@ -1541,6 +1541,9 @@
 	exports.init = init
 	exports.createItem = createItem
 	exports.items = BIU_GLOBAL.SVGItems
+	exports.currentItems = function() {
+		return BIU_GLOBAL.SVGItems
+	}
 	exports.auxs = BIU_GLOBAL.checkedAUX
 	exports.svg = function() {
 		return BIU_GLOBAL.svg
