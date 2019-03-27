@@ -1548,4 +1548,7 @@
 	exports.svg = function() {
 		return BIU_GLOBAL.svg
 	}
+	exports.itemMenu = function() {
+		return getItemMenuConf()
+	}
 })));
