@@ -1,2 +1,2 @@
 # biu
-[文档](http://wiki.suyun2006.com/product/biu)
+[文档](https://app.gitbook.com/@vanchun032/s/vanchun032/chan-pin/biu)
